@@ -14,12 +14,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "Admin" */ '../views/Admin.vue'),
     children: [
-      {
-        path: '/home',
-        name: 'Home',
-        component: () =>
-          import(/* webpackChunkName: "Home" */ '../views/Show.vue')
-      },
+      // {
+      //   path: '/home',
+      //   name: 'Home',
+      //   component: () =>
+      //     import(/* webpackChunkName: "Home" */ '../views/Show.vue')
+      // },
       {
         path: '/user',
         name: 'UserIndex',
@@ -34,12 +34,6 @@ const routes = [
               import(/* webpackChunkName: "List" */ '../views/user/List.vue')
           }
         ]
-      },
-      {
-        path: '/add',
-        name: 'Add',
-        component: () =>
-          import(/* webpackChunkName: "Add" */ '../views/Add.vue')
       }
     ]
   },

@@ -112,10 +112,10 @@ export default {
     // 获取所有的菜单
     async getMenuList() {
       const { data } = await this.$http.get('adminSide')
-      console.log(data)
+      // console.log(data)
       // console.log(typeof (data.status))
       this.menulist = data.menu
-      console.log(this.menulist[0].children.length)
+      // console.log(this.menulist[0].children.length)
       if (data.status !== 200) return this.$message.error(data.message)
       if (data.status === 200) return this.$message.success(data.message)
     },
