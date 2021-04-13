@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-04-01 15:55:33
- * @LastEditTime: 2021-04-09 14:37:19
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \vue_mi_backstage\src\store\index.js
- */
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -17,56 +9,64 @@ export default new Vuex.Store({
     addForm: {
       userNameValue: '',
       userPwdValue: '',
+      userTelValue: '',
+      userEmailValue: ''
+    },
+    editForm: {
+      userNameValue: '',
+      userTelValue: '',
       userEmailValue: ''
     }
   },
   mutations: {
     // 清除输入框内容
     inputClean(state) {
-      state.addForm = {
-        userNameValue: '',
-        userPwdValue: '',
-        userEmailValue: ''
-      }
-      // state.addForm = {
-      //   userNameValue: '',
-      //   userPwdValue: '',
-      //   userEmailValue: ''
-      // }
-      // console.log(state.userNameValue)
+      state.addForm.userNameValue = ''
+      state.addForm.userPwdValue = ''
+      state.addForm.userTelValue = ''
+      state.addForm.userEmailValue = ''
+      state.editForm.userNameValue = ''
+      state.editForm.userTelValue = ''
+      state.editForm.userEmailValue = ''
     },
     // 设置 inputValue 值
     setInputValue(state, val) {
-      // console.log(val)
-      // val ? (state.addForm.userNameValue = val) : (state.addForm.userNameValue = '')
-      // val ? (state.addForm = val) : (state.addForm = {
-      //   userNameValue: '',
-      //   userPwdValue: '',
-      //   userEmailValue: ''
-      // })
-      switch (val.addUserInput) {
-        case 'name':
-          state.addForm.userNameValue = val.e
-          break
-        case 'pwd':
-          state.addForm.userPwdValue = val.e
-          break
-        case 'email':
-          state.addForm.userEmailValue = val.e
-          break
-        default:
-          state.addForm = {
-            userNameValue: '',
-            userPwdValue: '',
-            userEmailValue: ''
-          }
-      }
       console.log(val)
-      // if (val) {
-      //   state.inputValue = val
-      // } else {
-      //   state.inputValue = ''
-      // }
+      if (val.use === 'addForm') {
+        switch (val.input) {
+          case 'name':
+            state.addForm.userNameValue = val.e
+            break
+          case 'pwd':
+            state.addForm.userPwdValue = val.e
+            break
+          case 'tel':
+            state.addForm.userTelValue = val.e
+            break
+          case 'email':
+            state.addForm.userEmailValue = val.e
+            break
+          default:
+            state.addForm.userNameValue = ''
+            state.addForm.userPwdValue = ''
+            state.addForm.userTelValue = ''
+            state.addForm.userEmailValue = ''
+        }
+      } else {
+        switch (val.input) {
+          case 'tel':
+            state.editForm.userTelValue = val.e
+            break
+          case 'email':
+            state.editForm.userEmailValue = val.e
+            break
+          default:
+            state.editForm.userNameValue = ''
+            state.editForm.userTelValue = ''
+            state.editForm.userEmailValue = ''
+        }
+      }
+      // console.log(val)
     }
   },
   actions: {},

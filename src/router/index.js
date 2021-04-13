@@ -24,14 +24,33 @@ const routes = [
         path: '/user',
         name: 'UserIndex',
         component: () =>
-          import(/* webpackChunkName: "Admin" */ '../views/user/Index.vue'),
+          import(/* webpackChunkName: "UserIndex" */ '../views/user/Index.vue'),
         redirect: '/list',
         children: [
           {
             path: '/user/list',
             name: 'List',
             component: () =>
-              import(/* webpackChunkName: "List" */ '../views/user/List.vue')
+              import(
+                /* webpackChunkName: "UserList" */ '../views/user/List.vue'
+              )
+          }
+        ]
+      },
+      {
+        path: '/power',
+        name: 'PowerIndex',
+        component: () =>
+          import(/* webpackChunkName: "PowerIndex" */ '../views/power/Index.vue'),
+        redirect: '/role',
+        children: [
+          {
+            path: '/power/role',
+            name: 'Role',
+            component: () =>
+              import(
+                /* webpackChunkName: "PowerRole" */ '../views/power/Role.vue'
+              )
           }
         ]
       }
