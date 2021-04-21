@@ -5,6 +5,19 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 用户信息
+    userinfo: {
+      username: '',
+      tel: '',
+      useremail: '',
+      powername: [],
+      powerurl: [],
+      isLogin: false
+    },
+    // 当前调用组件
+    thisComponent: '',
+    userRoleId: '',
+    SelectRoleId: '',
     dialogShow: false,
     addForm: {
       userNameValue: '',
@@ -16,9 +29,29 @@ export default new Vuex.Store({
       userNameValue: '',
       userTelValue: '',
       userEmailValue: ''
-    }
+    },
+    AssginRoles: []
   },
   mutations: {
+    getUserInfo(state, userinfo) {
+      var key
+      for (key in userinfo) {
+        state.userinfo[key] = userinfo[key]
+      }
+    },
+    handelSelectRoleId(state, SelectRoleId) {
+      state.SelectRoleId = SelectRoleId
+    },
+    // 存储当前调用组件
+    useComponent(state, component) {
+      state.thisComponent = component
+    },
+    userInfoRoute(state) {
+      return state.userinfo
+    },
+    getUserRoleId(state, id) {
+      state.userRoleId = id
+    },
     // 清除输入框内容
     inputClean(state) {
       state.addForm.userNameValue = ''
@@ -67,6 +100,14 @@ export default new Vuex.Store({
         }
       }
       // console.log(val)
+    }
+  },
+  getters: {
+    routerUserInfo: state => {
+      return state.userinfo
+    },
+    getComponent: state => {
+      return state.thisComponent
     }
   },
   actions: {},

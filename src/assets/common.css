@@ -21,6 +21,7 @@ body,
   margin: 0;
   padding: 0;
   min-width: 1366px;
+  font-size: 14px;
 }
 .el-breadcrumb {
   margin-bottom: 20px;

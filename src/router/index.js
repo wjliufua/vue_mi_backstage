@@ -1,11 +1,18 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    redirect: '/admin'
+    redirect: '/login'
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () =>
+      import(/* webpackChunkName: "Login" */ '../views/Login.vue')
   },
   {
     path: '/admin',
@@ -14,12 +21,6 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "Admin" */ '../views/Admin.vue'),
     children: [
-      // {
-      //   path: '/home',
-      //   name: 'Home',
-      //   component: () =>
-      //     import(/* webpackChunkName: "Home" */ '../views/Show.vue')
-      // },
       {
         path: '/user',
         name: 'UserIndex',
@@ -29,7 +30,7 @@ const routes = [
         children: [
           {
             path: '/user/list',
-            name: 'List',
+            name: 'UserList',
             component: () =>
               import(
                 /* webpackChunkName: "UserList" */ '../views/user/List.vue'
@@ -41,7 +42,9 @@ const routes = [
         path: '/power',
         name: 'PowerIndex',
         component: () =>
-          import(/* webpackChunkName: "PowerIndex" */ '../views/power/Index.vue'),
+          import(
+            /* webpackChunkName: "PowerIndex" */ '../views/power/Index.vue'
+          ),
         redirect: '/role',
         children: [
           {
@@ -69,6 +72,24 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+var jwt = require('jsonwebtoken')
+
+router.beforeEach((to, from, next) => {
+  jwt.decode('token')
+  const tokenFlag = jwt.verify(
+    window.sessionStorage.getItem('token'),
+    'abc',
+    (err, decode) => {
+      if (err) return false
+      return true
+    }
+  )
+  if (to.name !== 'Login' && !tokenFlag) {
+    next({ name: 'Login' })
+  } else {
+    next()
+  }
 })
 
 export default router

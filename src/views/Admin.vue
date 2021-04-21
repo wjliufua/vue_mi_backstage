@@ -111,13 +111,39 @@ export default {
   methods: {
     // 获取所有的菜单
     async getMenuList() {
-      const { data } = await this.$http.get('adminSide')
+      const { data } = await this.$http.get('menu')
       // console.log(data)
       // console.log(typeof (data.status))
-      this.menulist = data.menu
-      // console.log(this.menulist[0].children.length)
+      const sideList = []
+      let mIndex = 0
+      data.menu.map(m => {
+        if (m.proute === '/') {
+          const sideItem = {
+            name: m.name,
+            path: m.route,
+            children: []
+          }
+          sideList.push(sideItem)
+          this.handleSide(data.menu, sideList, m.route, mIndex)
+          mIndex++
+        }
+      })
+      this.menulist = sideList
       if (data.status !== 200) return this.$message.error(data.message)
       if (data.status === 200) return this.$message.success(data.message)
+    },
+    handleSide(menus, sideList, route, mIndex) {
+      menus.map(m => {
+        if (m.proute === route) {
+          const childrenItem = {
+            name: m.name,
+            path: m.route,
+            children: []
+          }
+          sideList[mIndex].children.push(childrenItem)
+          this.handleSide(menus, childrenItem, m.route)
+        }
+      })
     },
     // 控制侧边栏显示隐藏
     sideShow() {

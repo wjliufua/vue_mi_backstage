@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-07 11:40:02
- * @LastEditTime: 2021-04-12 21:58:47
+ * @LastEditTime: 2021-04-14 11:00:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \vue_mi_backstage\src\views\user\List.vue
@@ -22,7 +22,10 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="showDialog('添加用户', 'add')"
+          <el-button
+            type="primary"
+            @click="showDialog('添加用户', 'add')"
+            v-if="showAddButton()"
             >添加用户</el-button
           >
         </el-col>
@@ -43,7 +46,16 @@
         </el-table-column>
         <el-table-column prop="tel" label="电话" align="center">
         </el-table-column>
-        <el-table-column prop="role" label="角色" align="center">
+        <!-- <el-table-column label="角色" align="center">
+          <template slot-scope="scope">
+            <span v-for="(item, index) in scope.row.position_id" :key="index">{{
+              item.name
+            }}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="position_id.name" label="角色" align="center">
+        </el-table-column>
+        <el-table-column prop="branch_id.name" label="部门" align="center">
         </el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
@@ -68,7 +80,7 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
-              @click="showDialog('修改用户', 'edit', scope.row)"
+              @click="showDialog('修改用户', 'edit', scope.row, true)"
             ></el-button>
             <!-- 删除用户 -->
             <el-button
@@ -87,6 +99,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="showDialog('分配角色', 'role', scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -128,7 +141,9 @@
 </template>
 
 <script>
+// 引入封装的 dialog 组件
 import DiaLogComponent from '../../components/Dialog'
+// 引入 vuex 中的数据
 import { mapState } from 'vuex'
 // import { mapState, mapMutations } from 'vuex'
 
@@ -141,20 +156,28 @@ export default {
       dialogContent: '',
       // 用户列表数据
       userList: [],
+      addButtonFlag: false,
+      // 要修改的用户 id
       userId: '',
+      // 用户数据总条数
       total: 0,
+      // 页面状态
       pageState: {
+        // 当前第几页
         pageNum: 1,
+        // 当前一页显示多少条数据
         pageSize: 5
       }
     }
   },
   created() {
+    // 获取用户数据
     this.getUserList()
   },
   computed: {
-    ...mapState(['addForm', 'editForm', 'dialogShow'])
-    // ...mapState(['inputValue']),
+    // 解构获取 vuex state 中定义的数据
+    ...mapState(['addForm', 'editForm', 'dialogShow', 'userinfo'])
+    // ...mapState(['inputValue'])
     // ...mapMutations(['inputClean'])
   },
   methods: {
@@ -163,11 +186,10 @@ export default {
      * @desc 获取用户列表信息
      */
     async getUserList() {
-      //   console.log(444)
+      // 发送获取用户列表数据的请求
       const { data } = await this.$http.get('user', { params: this.pageState })
       this.userList = data.userlist
       this.total = data.total
-      console.log(data.userlist)
     },
 
     /**
@@ -176,18 +198,42 @@ export default {
      * @param {String} title 对话框标题
      * @param {String} component 对话框需要调用的组件
      * @param {Object} data 该用户的数据
+     * @param {Boolean} userEdit 判断该操作是否为用户信息编辑操作 --> undefined && false : 否 | true : 是
      */
-    showDialog(title, component, data) {
-      this.$store.state.dialogShow = true
-      this.dialogTitle = title
-      this.dialogContent = component
+    showDialog(title, component, data, userEdit) {
+      // 调用 vuex 中的 inputClean 方法
+      this.$store.commit('inputClean')
       if (data) {
-        console.log(data)
-        this.userId = data._id
+        // 调用 vuex 中 getUserId 方法
+        // {String} data._id 需要修改的用户的 id
+        this.$store.commit('getUserRoleId', data._id)
+      }
+      // 调用 vuex 中的 useComponent 方法
+      // {String} component
+      this.$store.commit('useComponent', component)
+      // 判断是否为 修改用户 操作 并且需要 data 值不为空
+      // if (!userEdit && data) {
+      //   this.$store.state.AssginRoles = data
+      // }
+      // 如果函数为 用户修改 操作
+      if (userEdit) {
+        // 获取 sessionStorage 中存储的 权力 名称
+        const powerArr = JSON.parse(window.sessionStorage.getItem('powername'))
+        // 循环遍历获取的 权力 数组
+        const powerFlag = powerArr.some(item => {
+          return item === '用户修改'
+        })
+        // 判断该数组中是否含有 修改用户 的权力
+        if (!powerFlag) return this.$message.error('抱歉，您没有该权限!')
+        // console.log(data)
+        // this.userId = data._id
         this.$store.state.editForm.userNameValue = data.username
         this.$store.state.editForm.userTelValue = data.tel
         this.$store.state.editForm.userEmailValue = data.useremail
       }
+      this.$store.state.dialogShow = true
+      this.dialogTitle = title
+      this.dialogContent = component
     },
 
     /**
@@ -197,9 +243,28 @@ export default {
     dialogClose(val) {
       this.$store.state.dialogShow = false
       this.$store.commit('inputClean')
-      if (val) {
+      // console.log(handleComponent)
+      this.$store.commit('useComponent', '')
+      this.$store.commit('handelSelectRoleId', '')
+      // console.log(val)
+      // console.log(handleComponent)
+      // const valFlag = typeof val
+      if (typeof val === 'string') {
+        // console.log(456789)
         this.getUserList()
       }
+    },
+    /**
+     * @method showAddButton
+     * @dese 是否显示添加用户按钮
+     * @return {Boolean}
+     */
+    showAddButton() {
+      const powerArr = JSON.parse(window.sessionStorage.getItem('powername'))
+      const powerFlag = powerArr.some(item => {
+        return item === '用户添加'
+      })
+      return powerFlag
     },
     handleSizeChange(newSize) {
       this.pageState.pageSize = newSize

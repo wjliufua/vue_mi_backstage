@@ -32,7 +32,9 @@
 </template>
 
 <script>
+// import { mapState, mapGetters } from 'vuex'
 import { mapState } from 'vuex'
+// var jwt = require('jsonwebtoken')
 
 export default {
   data() {
@@ -65,17 +67,45 @@ export default {
     }
   },
   created() {
-    this.userEditForm.name = this.editForm.userNameValue
-    this.userEditForm.tel = this.editForm.userTelValue
-    this.userEditForm.email = this.editForm.userEmailValue
+    // this.userEditForm.name = this.editForm.userNameValue
+    // this.userEditForm.tel = this.editForm.userTelValue
+    // this.userEditForm.email = this.editForm.userEmailValue
+    this.getUserInfo()
   },
   computed: {
-    ...mapState(['editForm']),
+    ...mapState(['editForm', 'userRoleId', 'thisComponent']),
+    // ...mapGetter(['getComponent']),
     valueLength() {
       return this.editForm.userEmailValue
     }
   },
   methods: {
+    async getUserInfo() {
+    //   const userPower = jwt.verify(
+    //     window.sessionStorage.getItem('token'),
+    //     'abc',
+    //     (err, decode) => {
+    //       if (err) return false
+    //       return decode
+    //     }
+    //   )
+    //   console.log(userPower)
+      // if (userPower) {
+      //   // console.log(233)
+      //   const userEditFlag = userPower.powername.some(item => {
+      //     return item === '用户查询'
+      //   })
+      //   console.log(userEditFlag)
+      //   if (!userEditFlag) return this.$message.error('抱歉,您暂无该权限!')
+      // }
+      // const Initiator = window.sessionStorage.
+      const data = await this.$http.get(`userEdit/${this.userRoleId}`)
+      // const data = await this.$http.get('userinfo')
+      // console.log(data.data.userEditInfo[0])
+      this.userEditForm.name = data.data.userEditInfo[0].username
+      this.userEditForm.tel = data.data.userEditInfo[0].tel
+      this.userEditForm.email = data.data.userEditInfo[0].useremail
+    },
     handleInputValue(e, editUserInput) {
       this.$forceUpdate()
       console.log(e)
@@ -92,6 +122,13 @@ export default {
     valueLength: function() {
       if (this.editForm.userNameValue.length === 0) {
         this.$refs.userEditForm.resetFields()
+      }
+    },
+    thisComponent: function() {
+      // console.log(54455454)
+      if (this.thisComponent === 'edit') {
+        // console.log(123132132)
+        this.getUserInfo()
       }
     }
   }
