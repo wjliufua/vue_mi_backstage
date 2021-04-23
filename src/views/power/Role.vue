@@ -26,16 +26,13 @@
             <el-row
               v-for="(item, index) in scope.row.expand"
               :key="index"
-              :class="[
-                'borderBottom',
-                index === 0 ? 'borderTop' : '',
-                'tagCenter'
-              ]"
+              :class="['borderBottom', index === 0 ? 'borderTop' : '']"
             >
               <el-col :span="5">
-                <el-tag closable>
+                <el-tag closable @close="removePower(scope.row, item.id)">
                   {{ item.name }}
                 </el-tag>
+                <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <el-row
@@ -44,9 +41,14 @@
                   :class="[index2 === 0 ? '' : 'borderTop', 'tagCenter']"
                 >
                   <el-col :span="6">
-                    <el-tag type="success" closable>
+                    <el-tag
+                      type="success"
+                      closable
+                      @close="removePower(scope.row, item2.id)"
+                    >
                       {{ item2.name }}
                     </el-tag>
+                    <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
                     <el-tag
@@ -54,75 +56,83 @@
                       :key="index3"
                       type="warning"
                       closable
-                      class="treeTag"
+                      @close="removePower(scope.row, item3.id)"
                     >
-                      {{ item3.power_name }}
+                      {{ item3.name }}
                     </el-tag>
                   </el-col>
                 </el-row>
               </el-col>
             </el-row>
           </template>
-          <!-- <template slot-scope="props">
-            <el-row>
-              <el-col :span="5"></el-col>
-              <el-col :span="19">
-                <el-row>
-                  <el-col :span="6"></el-col>
-                  <el-col :span="18"></el-col>
-                </el-row>
-              </el-col>
-            </el-row>
-          </template> -->
         </el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column label="角色名称" prop="name"> </el-table-column>
         <el-table-column label="角色描述" prop="describe"> </el-table-column>
         <el-table-column label="操作" align="center" width="300px">
-          <el-button type="primary" icon="el-icon-edit" size="mini"
-            >编辑</el-button
-          >
-          <el-button type="danger" icon="el-icon-delete" size="mini"
-            >删除</el-button
-          >
-          <el-button type="warning" icon="el-icon-setting" size="mini"
-            >分配权限</el-button
-          >
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" size="mini"
+              >编辑</el-button
+            >
+            <el-button type="danger" icon="el-icon-delete" size="mini"
+              >删除</el-button
+            >
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+              @click="showDialog('分配角色权限', 'roleTree', scope.row)"
+              >分配权限</el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
     </el-card>
+    <DiaLogComponent
+      :dialogTitle="dialogTitle"
+      :dialogShow="dialogShow"
+      :dialogContent="dialogContent"
+      :rolePutId="rolePutId"
+      @dialog-close="dialogClose($event)"
+    ></DiaLogComponent>
   </div>
 </template>
 
 <script>
+// 引入封装的 dialog 组件
+import DiaLogComponent from '../../components/Dialog'
+// 引入 vuex 中的数据
+import { mapState } from 'vuex'
+
 export default {
   data() {
     return {
       positionList: [],
-      expandList: []
+      expandList: [],
+      dialogTitle: '',
+      dialogContent: '',
+      rolePutId: ''
     }
   },
   created() {
     this.getRoleList()
   },
-  computed: {},
+  computed: {
+    ...mapState(['dialogShow'])
+  },
   methods: {
     async getRoleList() {
       const data = await this.$http.get('position')
-      console.log(data.data.positionList)
+      // console.log(data.data.positionList)
       this.positionList = data.data.positionList
+      // const powerClone = data.data.positionList
       this.expandListHandle(data.data.positionList, data.data.positionList)
-      // const expandListClone = []
       data.data.positionList.map((m, index) => {
         this.positionList[index].expand = this.expandListHandle(
           m.menu_id,
           m.power_id
         )
-        // this.expandListHandle(m.menu_id, m.power_id, expandListClone)
       })
-      console.log(this.positionList)
-      // console.log(expandListClone)
-      // this.expandList = expandListClone
     },
     expandListHandle(menu, power) {
       const expandListClone = []
@@ -130,6 +140,7 @@ export default {
         if (m.level === 1) {
           expandListClone.push({
             route: m.route,
+            id: m.id,
             proute: m.proute,
             name: m.name,
             children: []
@@ -138,33 +149,63 @@ export default {
         if (m.level === 2 && m.proute !== '/') {
           const children = power.filter(f => {
             return f.menu_id.route === m.route
-            // if (f.menu_id.route === m.route) {
-            //   console.log(f.power_name)
-            //   return { power_name: f.power_name, power_id: f._id }
-            // }
           })
-          // console.log(children)
           expandListClone.map((x, index) => {
             if (x.route === m.proute) {
               expandListClone[index].children.push({
                 route: m.route,
+                id: m.id,
                 proute: m.proute,
                 name: m.name,
                 children: children
               })
             }
           })
-          // expandListClone[expandListClone.length - 1].children.push({
-          //   route: m.route,
-          //   proute: m.proute,
-          //   name: m.name,
-          //   children: children
-          // })
         }
       })
       return expandListClone
-      // console.log(expandListClone)
+    },
+    showDialog(title, component, data) {
+      // this.$store.state.positionId = data
+      console.log(data)
+      if (data) {
+        this.rolePutId = data._id
+        this.$store.commit('getRoleTree', data.expand)
+      }
+      // console.log(data)
+      this.$store.state.dialogShow = true
+      this.dialogTitle = title
+      this.dialogContent = component
+    },
+    dialogClose(val) {
+      this.$store.state.dialogShow = false
+      if (typeof val === 'string') {
+        this.getRoleList()
+      }
+    },
+    async removePower(expandData, dId) {
+      console.log(expandData._id)
+      console.log(dId)
+      const deleteClick = await this.$confirm(
+        '此操作将永久删除该文件, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+      if (deleteClick !== 'confirm') return this.$message.info('您取消了删除!')
+      const data = await this.$http.delete(`position/${expandData._id}`, {
+        params: {
+          powerId: dId
+        }
+      })
+      console.log(data)
     }
+  },
+  components: {
+    DiaLogComponent
   }
 }
 </script>
@@ -187,7 +228,7 @@ export default {
   align-items: center;
 }
 
-.treeTag {
+.el-tag {
   margin: 10px;
 }
 </style>

@@ -16,8 +16,14 @@ export default new Vuex.Store({
     },
     // 当前调用组件
     thisComponent: '',
+    // 用户角色id
     userRoleId: '',
+    // 用户列表分配角色 选择菜单
     SelectRoleId: '',
+    roleTreeData: [],
+    positionId: '',
+    roleTreePut: '',
+    // 控制 dialog 组件是否显示
     dialogShow: false,
     addForm: {
       userNameValue: '',
@@ -49,8 +55,13 @@ export default new Vuex.Store({
     userInfoRoute(state) {
       return state.userinfo
     },
+    // 获取用户角色 id
     getUserRoleId(state, id) {
       state.userRoleId = id
+    },
+    // 获取角色 树状权力数据
+    getRoleTree(state, data) {
+      state.roleTreeData = data
     },
     // 清除输入框内容
     inputClean(state) {

@@ -14,7 +14,10 @@
   >
     <add-from v-if="dialogContent === 'add'"></add-from>
     <edit-from v-if="dialogContent === 'edit'"></edit-from>
-    <role-tree v-if="dialogContent === 'role'"></role-tree>
+    <role-select ref="roleSelect" v-if="dialogContent === 'role'"></role-select>
+    <role-tree
+      v-if="dialogShowClone && dialogContent === 'roleTree'"
+    ></role-tree>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -28,6 +31,7 @@
 import AddFrom from './user/AddUser'
 import EditFrom from './user/EditUser'
 import AssignRoles from './user/AssignRoles'
+import RoleTree from './power/RoleTree'
 import { mapState } from 'vuex'
 
 export default {
@@ -44,10 +48,15 @@ export default {
     },
     userId: {
       type: String
+    },
+    rolePutId: {
+      type: String
     }
   },
   data() {
-    return {}
+    return {
+      dialogShowClone: true
+    }
   },
   computed: {
     ...mapState(['addForm', 'editForm', 'userRoleId', 'SelectRoleId'])
@@ -55,6 +64,7 @@ export default {
   methods: {
     handleClose(val) {
       // console.log(val)
+      this.dialogShowClone = false
       this.$emit('dialog-close', val)
     },
 
@@ -74,6 +84,9 @@ export default {
           break
         case 'role':
           this.userRole()
+          break
+        case 'roleTree':
+          this.roleTree()
           break
         default:
           this.$message.error('暂无此方法!')
@@ -140,12 +153,30 @@ export default {
       this.handleClose('edit')
       // this.$store.commit('inputClean')
       // console.log(123)
+    },
+    async roleTree() {
+      // console.log(this.rolePutId)
+      const data = await this.$http.put(`position/${this.rolePutId}`, {
+        parame: this.$children[0].$children[2].$refs.tree.getCheckedKeys(false)
+      })
+      console.log(data)
+      if (data.data.status !== 200) {
+        return this.$message.error('角色权限修改失败!')
+      }
+      this.$message.success('角色权限修改成功!')
+      this.handleClose('tree')
+    }
+  },
+  watch: {
+    '$store.state.dialogShow': async function() {
+      this.dialogShowClone = this.dialogShow
     }
   },
   components: {
     'add-from': AddFrom,
     'edit-from': EditFrom,
-    'role-tree': AssignRoles
+    'role-select': AssignRoles,
+    'role-tree': RoleTree
   }
 }
 </script>
