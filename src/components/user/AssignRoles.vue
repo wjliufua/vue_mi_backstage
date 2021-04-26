@@ -1,19 +1,18 @@
 <template>
-  <el-form ref="AssignRolesForm" :model="AssignRolesForm" label-width="120px">
+  <el-form ref="Form" :model="Form" label-width="120px">
     <el-form-item label="当前用户">
-      <el-input v-model="AssignRolesForm.name" :disabled="true"></el-input>
+      <el-input v-model="Form.name" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="当前用户角色">
-      <el-input v-model="AssignRolesForm.userRole" :disabled="true"></el-input>
+      <el-input v-model="Form.userRole" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="分配新角色">
       <el-select
         v-model="SelectRoleId"
         placeholder="请选择要分配的角色"
-        @change="roleSelectChange(SelectRoleId)"
       >
         <el-option
-          v-for="(item, index) in AssignRolesForm.allRole"
+          v-for="(item, index) in Form.allRole"
           :key="index"
           :label="item.name"
           :value="item._id"
@@ -30,7 +29,7 @@ import { mapState } from 'vuex'
 export default {
   data() {
     return {
-      AssignRolesForm: { name: '', userRole: '', allRole: [] },
+      Form: { name: '', userRole: '', allRole: [] },
       SelectRoleId: ''
     }
   },
@@ -43,19 +42,14 @@ export default {
   methods: {
     async getUserInfo() {
       // console.log(this.userRoleId)
-      const userInfo = await this.$http.get(`userRole/${this.userRoleId}`)
+      const userData = await this.$http.get(`userRole/${this.userRoleId}`)
       const role = await this.$http.get('userRole')
       // console.log(role)
       // const userRoleInfo = data.data.userRoleInfo
-      this.AssignRolesForm.name = userInfo.data.userRoleInfo[0].username
-      this.AssignRolesForm.userRole =
-        userInfo.data.userRoleInfo[0].position_id.name
-      this.AssignRolesForm.allRole = role.data.role
-    },
-    roleSelectChange(SelectRoleId) {
-      console.log(SelectRoleId)
-      this.$store.commit('handelSelectRoleId', SelectRoleId)
-      // this.$emit('role-change', val)
+      const userInfo = userData.data.userRoleInfo[0]
+      this.Form.name = userInfo.username
+      this.Form.userRole = userInfo.position_id.name
+      this.Form.allRole = role.data.role
     }
   },
   watch: {
@@ -66,7 +60,7 @@ export default {
         this.getUserInfo()
       }
     },
-    'AssignRolesForm.name': function() {
+    'Form.name': function() {
       this.SelectRoleId = ''
     }
   }

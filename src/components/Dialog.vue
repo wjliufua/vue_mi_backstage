@@ -12,12 +12,16 @@
     :visible.sync="dialogShow"
     :before-close="handleClose"
   >
-    <add-from v-if="dialogContent === 'add'"></add-from>
-    <edit-from v-if="dialogContent === 'edit'"></edit-from>
+    <add-form ref="addForm" v-if="dialogContent === 'add'"></add-form>
+    <edit-form
+      ref="editForm"
+      v-if="componentLoding && dialogContent === 'edit'"
+    ></edit-form>
     <role-select ref="roleSelect" v-if="dialogContent === 'role'"></role-select>
     <role-tree
-      v-if="dialogShowClone && dialogContent === 'roleTree'"
+      v-if="componentLoding && dialogContent === 'roleTree'"
     ></role-tree>
+    <role-edit v-if="dialogContent === 'roleEdit'"></role-edit>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -28,10 +32,11 @@
 </template>
 
 <script>
-import AddFrom from './user/AddUser'
-import EditFrom from './user/EditUser'
+import AddForm from './user/AddUser'
+import EditForm from './user/EditUser'
 import AssignRoles from './user/AssignRoles'
 import RoleTree from './power/RoleTree'
+import RoleEdit from './power/RoleEdit'
 import { mapState } from 'vuex'
 
 export default {
@@ -51,20 +56,31 @@ export default {
     },
     rolePutId: {
       type: String
+    },
+    roleEditId: {
+      type: String
     }
   },
   data() {
     return {
-      dialogShowClone: true
+      componentLoding: true
     }
   },
   computed: {
-    ...mapState(['addForm', 'editForm', 'userRoleId', 'SelectRoleId'])
+    ...mapState(['userRoleId'])
   },
   methods: {
+    childrenComponent() {
+      this.componentLoding = true
+    },
     handleClose(val) {
-      // console.log(val)
-      this.dialogShowClone = false
+      console.log(this)
+      this.componentLoding = false
+      for (const key in this.$refs) {
+        if (this.$refs[key]) {
+          this.$refs[key].$refs.Form.resetFields()
+        }
+      }
       this.$emit('dialog-close', val)
     },
 
@@ -74,7 +90,6 @@ export default {
      * @param {String} change 用户列表调用的组件名称
      */
     handleDetermine(change) {
-      console.log(change)
       switch (change) {
         case 'add':
           this.userAdd()
@@ -88,11 +103,12 @@ export default {
         case 'roleTree':
           this.roleTree()
           break
+        case 'RoleEdit':
+          this.RoleEdit()
+          break
         default:
           this.$message.error('暂无此方法!')
       }
-      //   const { data } = await this.$http.get('change')
-      //   console.log(data)
     },
 
     /**
@@ -100,17 +116,21 @@ export default {
      * @dese 发起添加用户的接口请求
      */
     async userAdd() {
+      const reqComponent = this.componentFor(this.$children, 1)
       const { data } = await this.$http.post('user', {
-        username: this.addForm.userNameValue,
-        userpwd: this.addForm.userPwdValue,
-        tel: this.addForm.userTelValue,
-        useremail: this.addForm.userEmailValue
+        addForm: reqComponent.Form
       })
-      //   this.$emit('refresh')
       if (data.status !== 200) return this.$message.error('用户添加失败!')
       this.$message.success('用户添加成功!')
       this.handleClose('add')
-      this.$store.commit('inputClean')
+      this.$refs.addForm.cleanForm()
+    },
+    componentFor(component, num) {
+      if (num < 2) {
+        num++
+        return this.componentFor(component[component.length - 1].$children, num)
+      }
+      return component[component.length - 1]
     },
 
     /**
@@ -118,14 +138,15 @@ export default {
      * @dese 发起修改用户的接口请求
      */
     async userEdit() {
+      const reqComponent = this.componentFor(this.$children, 1)
+      // console.log(reqComponent.Form)
       const { data } = await this.$http.put(`userEdit/${this.userId}`, {
-        tel: this.editForm.userTelValue,
-        useremail: this.editForm.userEmailValue
+        tel: reqComponent.Form.userTelephoneValue,
+        useremail: reqComponent.Form.userEmailValue
       })
       if (data.status !== 200) return this.$message.error('用户修改失败!')
       this.$message.success('用户修改成功!')
       this.handleClose('edit')
-      this.$store.commit('inputClean')
     },
 
     /**
@@ -133,29 +154,28 @@ export default {
      * @dese 发起修改用户的接口请求
      */
     async userRole() {
-      console.log('*******')
-      console.log(this.userRoleId)
-      console.log(this.SelectRoleId)
-      if (this.SelectRoleId === '') {
+      // console.log('*******')
+      // console.log(this)
+      const reqComponent = this.componentFor(this.$children, 1)
+      // console.log(reqComponent.SelectRoleId)
+      // console.log(this.SelectRoleId)
+      if (reqComponent.SelectRoleId === '') {
         return this.$message.error('请选择需要分配的角色!')
       }
-      // console.log(this.$refs.addFormRef.validate)
       const { data } = await this.$http.put(
         `userRole/${this.userRoleId}/userPosition`,
         {
           userRoleId: this.userRoleId,
-          SelectRoleId: this.SelectRoleId
+          SelectRoleId: reqComponent.SelectRoleId
         }
       )
       console.log(data)
       if (data.status !== 200) return this.$message.error('用户角色修改失败!')
       this.$message.success('用户角色修改成功!')
+      reqComponent.SelectRoleId = ''
       this.handleClose('edit')
-      // this.$store.commit('inputClean')
-      // console.log(123)
     },
     async roleTree() {
-      // console.log(this.rolePutId)
       const data = await this.$http.put(`position/${this.rolePutId}`, {
         parame: this.$children[0].$children[2].$refs.tree.getCheckedKeys(false)
       })
@@ -165,18 +185,17 @@ export default {
       }
       this.$message.success('角色权限修改成功!')
       this.handleClose('tree')
-    }
-  },
-  watch: {
-    '$store.state.dialogShow': async function() {
-      this.dialogShowClone = this.dialogShow
+    },
+    async RoleEdit() {
+      console.log(this.roleEditId)
     }
   },
   components: {
-    'add-from': AddFrom,
-    'edit-from': EditFrom,
+    'add-form': AddForm,
+    'edit-form': EditForm,
     'role-select': AssignRoles,
-    'role-tree': RoleTree
+    'role-tree': RoleTree,
+    'role-edit': RoleEdit
   }
 }
 </script>

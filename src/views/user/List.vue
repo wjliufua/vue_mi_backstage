@@ -117,6 +117,7 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 使用 dialog 组件 -->
     <DiaLogComponent
       :dialogTitle="dialogTitle"
       :dialogShow="dialogShow"
@@ -125,18 +126,6 @@
       @dialog-close="dialogClose($event)"
       @refresh="getUserList"
     ></DiaLogComponent>
-    <!-- <el-dialog
-      :title="dialogTitle"
-      :visible.sync="dialogShow"
-      width="30%"
-      :before-close="handleClose"
-    >
-      <span>{{ dialogContent }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogShow = false">取 消</el-button>
-        <el-button type="primary" @click="dialogShow = false">确 定</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 
@@ -156,9 +145,11 @@ export default {
       dialogContent: '',
       // 用户列表数据
       userList: [],
+      // 是否显示添加用户按钮
       addButtonFlag: false,
       // 要修改的用户 id
       userId: '',
+      dialogShow: false,
       // 用户数据总条数
       total: 0,
       // 页面状态
@@ -176,7 +167,7 @@ export default {
   },
   computed: {
     // 解构获取 vuex state 中定义的数据
-    ...mapState(['addForm', 'editForm', 'dialogShow', 'userinfo'])
+    ...mapState(['userinfo'])
     // ...mapState(['inputValue'])
     // ...mapMutations(['inputClean'])
   },
@@ -201,8 +192,10 @@ export default {
      * @param {Boolean} userEdit 判断该操作是否为用户信息编辑操作 --> undefined && false : 否 | true : 是
      */
     showDialog(title, component, data, userEdit) {
+      // console.log(this)
+      this.$children[this.$children.length - 1].childrenComponent()
       // 调用 vuex 中的 inputClean 方法
-      this.$store.commit('inputClean')
+      // this.$store.commit('inputClean')
       if (data) {
         // 调用 vuex 中 getUserId 方法
         // {String} data._id 需要修改的用户的 id
@@ -226,12 +219,13 @@ export default {
         // 判断该数组中是否含有 修改用户 的权力
         if (!powerFlag) return this.$message.error('抱歉，您没有该权限!')
         // console.log(data)
-        // this.userId = data._id
-        this.$store.state.editForm.userNameValue = data.username
-        this.$store.state.editForm.userTelValue = data.tel
-        this.$store.state.editForm.userEmailValue = data.useremail
+        this.userId = data._id
+        // this.$store.commit('setEditForm', data)
+        // this.$store.state.editForm.userNameValue = data.username
+        // this.$store.state.editForm.userTelValue = data.tel
+        // this.$store.state.editForm.userEmailValue = data.useremail
       }
-      this.$store.state.dialogShow = true
+      this.dialogShow = true
       this.dialogTitle = title
       this.dialogContent = component
     },
@@ -241,8 +235,10 @@ export default {
      * @desc 关闭对话框
      */
     dialogClose(val) {
-      this.$store.state.dialogShow = false
-      this.$store.commit('inputClean')
+      this.dialogShow = false
+      // this.$children[this.$children.length - 1].$refs = {}
+      console.log(this.$children[this.$children.length - 1].$refs)
+      // this.$store.commit('inputClean')
       // console.log(handleComponent)
       this.$store.commit('useComponent', '')
       this.$store.commit('handelSelectRoleId', '')
@@ -288,6 +284,7 @@ export default {
     }
   },
   components: {
+    // 挂载 dialog 组件
     DiaLogComponent
   }
 }

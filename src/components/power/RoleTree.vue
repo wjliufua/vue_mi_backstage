@@ -2,7 +2,7 @@
   <el-tree
     :data="treeData"
     show-checkbox
-    node-key="id"
+    node-key="tid"
     ref="tree"
     default-expand-all
     :default-checked-keys="treeId"
@@ -50,8 +50,9 @@ export default {
       const data = await this.$http.get('roleTree')
       this.treeData = data.data.tree
       console.log(data.data.tree)
+      console.log(this.roleTreeData)
       this.handleTreeData(this.roleTreeData)
-    //   console.log(this.treeId)
+      console.log(this.treeId)
     },
     handleTreeData(data) {
       //   this.treeData = this.roleTreeData
@@ -62,8 +63,10 @@ export default {
         if (item.children) {
           return this.handleTreeData(item.children)
         }
-        this.treeId.push(item.id)
+        // console.log(item)
+        this.treeId.push(item.tid)
       })
+      //   console.log(this.treeId)
       //   console.log(data.id)
       //   this.treeId.push(data.id)
       //   if (data.children) {

@@ -7,50 +7,51 @@
  * @FilePath: \vue_mi_backstage\src\components\AddUser.vue
 -->
 <template>
-  <el-form label-width="100px" :rules="rules" :model="ruleForm" ref="ruleForm">
-    <el-form-item label="用户名" prop="name">
+  <el-form label-width="100px" :rules="rules" :model="Form" ref="Form">
+    <el-form-item label="用户名" prop="userNameValue">
       <el-input
-        :value="ruleForm.name"
-        @input="handleInputValue($event, 'name')"
+        :value="Form.userNameValue"
+        @input="handleInputValue($event, 'userNameValue')"
       ></el-input>
     </el-form-item>
-    <el-form-item label="密码" prop="password">
+    <el-form-item label="密码" prop="userPasswordValue">
       <el-input
         show-password
-        :value="ruleForm.password"
-        @input="handleInputValue($event, 'pwd')"
+        :value="Form.userPasswordValue"
+        @input="handleInputValue($event, 'userPasswordValue')"
       ></el-input>
     </el-form-item>
-    <el-form-item label="邮箱" prop="email">
+    <el-form-item label="邮箱" prop="userEmailValue">
       <el-input
-        :value="ruleForm.email"
-        @input="handleInputValue($event, 'email')"
+        :value="Form.userEmailValue"
+        @input="handleInputValue($event, 'userEmailValue')"
       ></el-input>
     </el-form-item>
-    <el-form-item label="电话" prop="email">
+    <el-form-item label="电话" prop="userTelephoneValue">
       <el-input
-        :value="ruleForm.tel"
-        @input="handleInputValue($event, 'tel')"
+        :value="Form.userTelephoneValue"
+        @input="handleInputValue($event, 'userTelephoneValue')"
       ></el-input>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
   data() {
+    // 密码验证规则
     var checkPwd = (rule, value, cb) => {
       var regEmail = /^[A-Za-z0-9]{8,11}/
       if (regEmail.test(value)) return cb()
       cb(new Error('密码只能输入8-10位数字和字母'))
     }
+    // 邮箱验证规则
     var checkEmail = (rule, value, cb) => {
       var regEmail = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
       if (regEmail.test(value)) return cb()
       cb(new Error('请输入合法的邮箱地址'))
     }
+    // 手机号验证规则
     var checkTel = (rule, value, cb) => {
       var regTel = /^[0-9]{9,11}$/
       if (regTel.test(value)) return cb()
@@ -58,57 +59,54 @@ export default {
     }
     return {
       // 添加用户表单数据
-      ruleForm: {
-        name: '',
-        password: '',
-        tel: '',
-        email: ''
+      Form: {
+        userNameValue: '',
+        userPasswordValue: '',
+        userEmailValue: '',
+        userTelephoneValue: ''
       },
       rules: {
-        name: [
+        // 用户名称验证
+        userNameValue: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
-        password: [
+        // 用户密码验证
+        userPasswordValue: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { validator: checkPwd, trigger: 'blur' }
         ],
-        email: [
+        // 用户邮箱验证
+        userEmailValue: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
           { validator: checkEmail, trigger: 'blur' }
         ],
-        tel: [
+        // 用户电话验证
+        userTelephoneValue: [
           { required: true, message: '请输入电话号码', trigger: 'blur' },
           { validator: checkTel, trigger: 'blur' }
         ]
       }
     }
   },
-  computed: {
-    ...mapState(['addForm']),
-    valueLength() {
-      return this.addForm.userNameValue
-    }
-  },
   methods: {
-    handleInputValue(e, addUserInput) {
-      this.$forceUpdate()
-      console.log(e)
-      this.$store.commit('setInputValue', {
-        e,
-        input: addUserInput,
-        use: 'addForm'
-      })
-      this.ruleForm.name = this.addForm.userNameValue
-      this.ruleForm.password = this.addForm.userPwdValue
-      this.ruleForm.tel = this.addForm.userTelValue
-      this.ruleForm.email = this.addForm.userEmailValue
-    }
-  },
-  watch: {
-    valueLength: function() {
-      if (this.addForm.userNameValue.length === 0) {
-        this.$refs.ruleForm.resetFields()
+    /**
+     * @method handleInputValue
+     * @desc 获取当前输入框输入内容
+     * @param {String, Number} inputValue 当处于 用户名、邮箱、密码 输入框时，值为 { String } || 当处于 电话 输入框时，值为 { Number }
+     * @param {String} addUserInput 当前处于哪个输入框中
+     */
+    handleInputValue(inputValue, addUserInput) {
+      this.Form[addUserInput] = inputValue
+    },
+
+    /**
+     * @method cleanForm
+     * @desc 清除表单内容
+     */
+    cleanForm() {
+      for (const key in this.Form) {
+        this.Form[key] = ''
       }
     }
   }

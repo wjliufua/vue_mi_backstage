@@ -7,25 +7,20 @@
  * @FilePath: \vue_mi_backstage\src\components\user\EditUser.vue
 -->
 <template>
-  <el-form
-    :model="userEditForm"
-    :rules="rules"
-    ref="userEditForm"
-    label-width="100px"
-  >
-    <el-form-item label="姓名" prop="name">
-      <el-input v-model="userEditForm.name" :disabled="true"></el-input>
+  <el-form :model="Form" :rules="rules" ref="Form" label-width="100px">
+    <el-form-item label="姓名">
+      <el-input v-model="Form.userName" :disabled="true"></el-input>
     </el-form-item>
-    <el-form-item label="邮箱" prop="email">
+    <el-form-item label="邮箱" prop="userEmailValue">
       <el-input
-        v-model="userEditForm.email"
-        @input="handleInputValue($event, 'email')"
+        v-model="Form.userEmailValue"
+        @input="handleInputValue($event, 'userEmailValue')"
       ></el-input>
     </el-form-item>
-    <el-form-item label="手机号" prop="tel">
+    <el-form-item label="手机号" prop="userTelephoneValue">
       <el-input
-        v-model="userEditForm.tel"
-        @input="handleInputValue($event, 'tel')"
+        v-model="Form.userTelephoneValue"
+        @input="handleInputValue($event, 'userTelephoneValue')"
       ></el-input>
     </el-form-item>
   </el-form>
@@ -49,17 +44,17 @@ export default {
       cb(new Error('请输入合法的手机号'))
     }
     return {
-      userEditForm: {
-        name: '',
-        tel: '',
-        email: ''
+      Form: {
+        userName: '',
+        userTelephoneValue: '',
+        userEmailValue: ''
       },
       rules: {
-        tel: [
+        userTelephoneValue: [
           { required: true, message: '请输入电话', trigger: 'blur' },
           { validator: checkTel, trigger: 'blur' }
         ],
-        email: [
+        userEmailValue: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
           { validator: checkEmail, trigger: 'blur' }
         ]
@@ -67,13 +62,13 @@ export default {
     }
   },
   created() {
-    // this.userEditForm.name = this.editForm.userNameValue
-    // this.userEditForm.tel = this.editForm.userTelValue
-    // this.userEditForm.email = this.editForm.userEmailValue
+    // this.Form.name = this.editForm.userNameValue
+    // this.Form.tel = this.editForm.userTelValue
+    // this.Form.email = this.editForm.userEmailValue
     this.getUserInfo()
   },
   computed: {
-    ...mapState(['editForm', 'userRoleId', 'thisComponent']),
+    ...mapState(['userRoleId', 'thisComponent']),
     // ...mapGetter(['getComponent']),
     valueLength() {
       return this.editForm.userEmailValue
@@ -81,15 +76,15 @@ export default {
   },
   methods: {
     async getUserInfo() {
-    //   const userPower = jwt.verify(
-    //     window.sessionStorage.getItem('token'),
-    //     'abc',
-    //     (err, decode) => {
-    //       if (err) return false
-    //       return decode
-    //     }
-    //   )
-    //   console.log(userPower)
+      //   const userPower = jwt.verify(
+      //     window.sessionStorage.getItem('token'),
+      //     'abc',
+      //     (err, decode) => {
+      //       if (err) return false
+      //       return decode
+      //     }
+      //   )
+      //   console.log(userPower)
       // if (userPower) {
       //   // console.log(233)
       //   const userEditFlag = userPower.powername.some(item => {
@@ -102,34 +97,22 @@ export default {
       const data = await this.$http.get(`userEdit/${this.userRoleId}`)
       // const data = await this.$http.get('userinfo')
       // console.log(data.data.userEditInfo[0])
-      this.userEditForm.name = data.data.userEditInfo[0].username
-      this.userEditForm.tel = data.data.userEditInfo[0].tel
-      this.userEditForm.email = data.data.userEditInfo[0].useremail
+      const userEditInfo = data.data.userEditInfo
+      this.Form.userName = userEditInfo[userEditInfo.length - 1].username
+      this.Form.userTelephoneValue = userEditInfo[userEditInfo.length - 1].tel
+      this.Form.userEmailValue = userEditInfo[userEditInfo.length - 1].useremail
     },
     handleInputValue(e, editUserInput) {
-      this.$forceUpdate()
-      console.log(e)
-      this.$store.commit('setInputValue', {
-        e,
-        input: editUserInput,
-        use: 'editForm'
-      })
-      this.userEditForm.tel = this.editForm.userTelValue
-      this.userEditForm.email = this.editForm.userEmailValue
-    }
-  },
-  watch: {
-    valueLength: function() {
-      if (this.editForm.userNameValue.length === 0) {
-        this.$refs.userEditForm.resetFields()
-      }
-    },
-    thisComponent: function() {
-      // console.log(54455454)
-      if (this.thisComponent === 'edit') {
-        // console.log(123132132)
-        this.getUserInfo()
-      }
+      this.Form[editUserInput] = e
+      // this.$forceUpdate()
+      // console.log(e)
+      // this.$store.commit('setInputValue', {
+      //   e,
+      //   input: editUserInput,
+      //   use: 'editForm'
+      // })
+      // this.Form.userTelephoneValue = this.editForm.userTelephoneValue
+      // this.Form.userEmailValue = this.editForm.userEmailValue
     }
   }
 }

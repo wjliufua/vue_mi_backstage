@@ -29,7 +29,10 @@
               :class="['borderBottom', index === 0 ? 'borderTop' : '']"
             >
               <el-col :span="5">
-                <el-tag closable @close="removePower(scope.row, item.id)">
+                <el-tag
+                  closable
+                  @close="removePower(scope.row, item.id, 'menu')"
+                >
                   {{ item.name }}
                 </el-tag>
                 <i class="el-icon-caret-right"></i>
@@ -44,7 +47,7 @@
                     <el-tag
                       type="success"
                       closable
-                      @close="removePower(scope.row, item2.id)"
+                      @close="removePower(scope.row, item2.id, 'menu')"
                     >
                       {{ item2.name }}
                     </el-tag>
@@ -56,7 +59,7 @@
                       :key="index3"
                       type="warning"
                       closable
-                      @close="removePower(scope.row, item3.id)"
+                      @close="removePower(scope.row, item3.id, 'power')"
                     >
                       {{ item3.name }}
                     </el-tag>
@@ -71,7 +74,11 @@
         <el-table-column label="角色描述" prop="describe"> </el-table-column>
         <el-table-column label="操作" align="center" width="300px">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini"
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showDialog('角色修改', 'roleEdit', scope.row._id)"
               >编辑</el-button
             >
             <el-button type="danger" icon="el-icon-delete" size="mini"
@@ -111,7 +118,8 @@ export default {
       expandList: [],
       dialogTitle: '',
       dialogContent: '',
-      rolePutId: ''
+      rolePutId: '',
+      roleEditId: ''
     }
   },
   created() {
@@ -140,7 +148,7 @@ export default {
         if (m.level === 1) {
           expandListClone.push({
             route: m.route,
-            id: m.id,
+            id: m._id,
             proute: m.proute,
             name: m.name,
             children: []
@@ -154,7 +162,7 @@ export default {
             if (x.route === m.proute) {
               expandListClone[index].children.push({
                 route: m.route,
-                id: m.id,
+                id: m.tid,
                 proute: m.proute,
                 name: m.name,
                 children: children
@@ -168,9 +176,12 @@ export default {
     showDialog(title, component, data) {
       // this.$store.state.positionId = data
       console.log(data)
-      if (data) {
+      if (typeof data === 'object') {
         this.rolePutId = data._id
         this.$store.commit('getRoleTree', data.expand)
+      }
+      if (typeof data === 'string') {
+        this.roleEditId = data
       }
       // console.log(data)
       this.$store.state.dialogShow = true
@@ -183,7 +194,14 @@ export default {
         this.getRoleList()
       }
     },
-    async removePower(expandData, dId) {
+    /**
+     * @method removePower
+     * @desc 删除展开行 tag 标签触发方法
+     * @param {Array} expandData 该角色渲染数据
+     * @param {Number} dId 用于后端判断删除的是 菜单项 还是 权力项的 tid
+     * @param {Array} key 渲染展开行的数
+     */
+    async removePower(expandData, dId, key) {
       console.log(expandData._id)
       console.log(dId)
       const deleteClick = await this.$confirm(
@@ -198,10 +216,14 @@ export default {
       if (deleteClick !== 'confirm') return this.$message.info('您取消了删除!')
       const data = await this.$http.delete(`position/${expandData._id}`, {
         params: {
-          powerId: dId
+          powerId: dId,
+          key: key
         }
       })
       console.log(data)
+    },
+    roleEdit(aaa) {
+      console.log(aaa)
     }
   },
   components: {
