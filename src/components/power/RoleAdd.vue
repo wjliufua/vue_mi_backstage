@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
   data() {
     return {
@@ -21,21 +19,8 @@ export default {
       }
     }
   },
-  created() {
-    this.getRoleInfo()
-  },
-  computed: {
-    ...mapState(['positionId'])
-  },
-  methods: {
-    async getRoleInfo() {
-      const data = await this.$http.get(`position/${this.positionId}`)
-      console.log(data.data.positionInfo)
-      const positionInfo = data.data.positionInfo[0]
-      this.Form.roleName = positionInfo.name
-      this.Form.roleDescribe = positionInfo.describe
-    }
-  }
+  created() {},
+  methods: {}
 }
 </script>
 

@@ -12,16 +12,31 @@
     :visible.sync="dialogShow"
     :before-close="handleClose"
   >
-    <add-form ref="addForm" v-if="dialogContent === 'add'"></add-form>
+    <!-- 添加用户表单 -->
+    <add-form
+      ref="addForm"
+      v-if="componentLoding && dialogContent === 'add'"
+    ></add-form>
+    <!-- 修改用户表单 -->
     <edit-form
       ref="editForm"
       v-if="componentLoding && dialogContent === 'edit'"
     ></edit-form>
-    <role-select ref="roleSelect" v-if="dialogContent === 'role'"></role-select>
+    <!-- 分配用户角色表单 -->
+    <role-select
+      ref="roleSelect"
+      v-if="componentLoding && dialogContent === 'role'"
+    ></role-select>
+    <!-- 角色权限分配树 -->
     <role-tree
       v-if="componentLoding && dialogContent === 'roleTree'"
     ></role-tree>
-    <role-edit v-if="dialogContent === 'roleEdit'"></role-edit>
+    <!-- 角色添加 -->
+    <role-add v-if="componentLoding && dialogContent === 'roleAdd'"></role-add>
+    <!-- 角色信息修改表单 -->
+    <role-edit
+      v-if="componentLoding && dialogContent === 'roleEdit'"
+    ></role-edit>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -32,11 +47,21 @@
 </template>
 
 <script>
+/** ********* 用户管理部分模块 ***********/
+// 添加用户表单
 import AddForm from './user/AddUser'
+// 修改用户表单
 import EditForm from './user/EditUser'
+// 分配用户角色表单
 import AssignRoles from './user/AssignRoles'
+/** ************************************/
+
+/** ********* 权限管理部分模块 ***********/
 import RoleTree from './power/RoleTree'
+import RoleAdd from './power/RoleAdd'
 import RoleEdit from './power/RoleEdit'
+/** ************************************/
+
 import { mapState } from 'vuex'
 
 export default {
@@ -67,14 +92,18 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userRoleId'])
+    ...mapState(['userRoleId', 'positionId'])
   },
   methods: {
     childrenComponent() {
+      console.log(true)
       this.componentLoding = true
     },
+
+    // ***********************************************************************************************************************************
     handleClose(val) {
-      console.log(this)
+      // console.log(this)
+      console.log(false)
       this.componentLoding = false
       for (const key in this.$refs) {
         if (this.$refs[key]) {
@@ -84,12 +113,15 @@ export default {
       this.$emit('dialog-close', val)
     },
 
-    /**
+    /*************************************************************************************************************************************
+     *
      * @method handleDetermine
      * @dese 判断发送请求时调用的方法
      * @param {String} change 用户列表调用的组件名称
-     */
+     *
+     *************************************************************************************************************************************/
     handleDetermine(change) {
+      console.log(change)
       switch (change) {
         case 'add':
           this.userAdd()
@@ -103,18 +135,23 @@ export default {
         case 'roleTree':
           this.roleTree()
           break
-        case 'RoleEdit':
-          this.RoleEdit()
+        case 'roleEdit':
+          this.roleEdit()
+          break
+        case 'roleAdd':
+          this.roleAdd()
           break
         default:
           this.$message.error('暂无此方法!')
       }
     },
 
-    /**
+    /*************************************************************************************************************************************
+     *
      * @method userAdd
      * @dese 发起添加用户的接口请求
-     */
+     *
+     *************************************************************************************************************************************/
     async userAdd() {
       const reqComponent = this.componentFor(this.$children, 1)
       const { data } = await this.$http.post('user', {
@@ -125,6 +162,8 @@ export default {
       this.handleClose('add')
       this.$refs.addForm.cleanForm()
     },
+
+    // ***********************************************************************************************************************************
     componentFor(component, num) {
       if (num < 2) {
         num++
@@ -133,7 +172,7 @@ export default {
       return component[component.length - 1]
     },
 
-    /**
+    /*************************************************************************************************************************************
      * @method userEdit
      * @dese 发起修改用户的接口请求
      */
@@ -149,6 +188,7 @@ export default {
       this.handleClose('edit')
     },
 
+    // ***********************************************************************************************************************************
     /**
      * @method userRole
      * @dese 发起修改用户的接口请求
@@ -175,6 +215,7 @@ export default {
       reqComponent.SelectRoleId = ''
       this.handleClose('edit')
     },
+    // ***********************************************************************************************************************************
     async roleTree() {
       const data = await this.$http.put(`position/${this.rolePutId}`, {
         parame: this.$children[0].$children[2].$refs.tree.getCheckedKeys(false)
@@ -186,8 +227,32 @@ export default {
       this.$message.success('角色权限修改成功!')
       this.handleClose('tree')
     },
-    async RoleEdit() {
-      console.log(this.roleEditId)
+    // ***********************************************************************************************************************************
+    async roleEdit() {
+      // console.log(this)
+      const reqComponent = this.componentFor(this.$children, 1)
+      console.log(reqComponent)
+      const data = await this.$http.put(
+        `position/Edit/${this.positionId}`,
+        reqComponent.Form
+      )
+      // console.log(data)
+      if (data.data.status !== 200) {
+        return this.$message.error('角色修改失败!')
+      }
+      this.$message.success('角色修改成功!')
+      this.handleClose('roleEdit')
+    },
+    async roleAdd() {
+      const reqComponent = this.componentFor(this.$children, 1)
+      // console.log(reqComponent)
+      const data = await this.$http.post('position', reqComponent.Form)
+      console.log(data)
+      if (data.data.status !== 200) {
+        return this.$message.error('角色添加失败!')
+      }
+      this.$message.success('角色添加成功!')
+      this.handleClose('roleEdit')
     }
   },
   components: {
@@ -195,6 +260,7 @@ export default {
     'edit-form': EditForm,
     'role-select': AssignRoles,
     'role-tree': RoleTree,
+    'role-add': RoleAdd,
     'role-edit': RoleEdit
   }
 }

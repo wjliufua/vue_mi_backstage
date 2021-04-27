@@ -16,7 +16,11 @@
     <el-card class="box-card">
       <el-row>
         <el-col :span="24">
-          <el-button type="primary">添加角色</el-button>
+          <el-button
+            type="primary"
+            @click="showDialog('角色添加', 'roleAdd')"
+            >添加角色</el-button
+          >
         </el-col>
       </el-row>
       <!-- 表格 -->
@@ -109,7 +113,7 @@
 // 引入封装的 dialog 组件
 import DiaLogComponent from '../../components/Dialog'
 // 引入 vuex 中的数据
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 
 export default {
   data() {
@@ -117,6 +121,7 @@ export default {
       positionList: [],
       expandList: [],
       dialogTitle: '',
+      dialogShow: false,
       dialogContent: '',
       rolePutId: '',
       roleEditId: ''
@@ -126,7 +131,7 @@ export default {
     this.getRoleList()
   },
   computed: {
-    ...mapState(['dialogShow'])
+    // ...mapState(['dialogShow'])
   },
   methods: {
     async getRoleList() {
@@ -182,14 +187,18 @@ export default {
       }
       if (typeof data === 'string') {
         this.roleEditId = data
+        this.$store.commit('handelPositionId', data)
       }
       // console.log(data)
-      this.$store.state.dialogShow = true
+      this.dialogShow = true
+      this.$children[this.$children.length - 1].childrenComponent()
+      // this.$store.state.dialogShow = true
       this.dialogTitle = title
       this.dialogContent = component
     },
     dialogClose(val) {
-      this.$store.state.dialogShow = false
+      this.dialogShow = false
+      // this.$store.state.dialogShow = false
       if (typeof val === 'string') {
         this.getRoleList()
       }

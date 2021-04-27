@@ -37,6 +37,9 @@ export default new Vuex.Store({
     handelSelectRoleId(state, SelectRoleId) {
       state.SelectRoleId = SelectRoleId
     },
+    handelPositionId(state, positionId) {
+      state.positionId = positionId
+    },
     // 存储当前调用组件
     useComponent(state, component) {
       state.thisComponent = component

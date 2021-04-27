@@ -54,6 +54,14 @@ const routes = [
               import(
                 /* webpackChunkName: "PowerRole" */ '../views/power/Role.vue'
               )
+          },
+          {
+            path: '/power/list',
+            name: 'RoleList',
+            component: () =>
+              import(
+                /* webpackChunkName: "RoleList" */ '../views/power/List.vue'
+              )
           }
         ]
       }
