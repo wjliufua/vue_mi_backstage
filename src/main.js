@@ -10,6 +10,8 @@ import './assets/common.css'
 // 引入公共样式
 import './assets/font.css'
 
+import TreeTable from 'vue-table-with-tree-grid'
+
 import axios from 'axios'
 
 axios.defaults.baseURL = 'http://127.0.0.1:7000/api/private/v1/'
@@ -57,6 +59,8 @@ axios.interceptors.request.use(config => {
 //     return Promise.reject(error)
 //   }
 // )
+
+Vue.component('tree-table', TreeTable)
 
 Vue.prototype.$http = axios
 

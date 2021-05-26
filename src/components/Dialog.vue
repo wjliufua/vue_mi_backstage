@@ -37,6 +37,10 @@
     <role-edit
       v-if="componentLoding && dialogContent === 'roleEdit'"
     ></role-edit>
+    <!-- 商品分类添加表单 -->
+    <goods-sort-add
+      v-if="componentLoding && dialogContent === 'goodsSortAdd'"
+    ></goods-sort-add>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -47,20 +51,24 @@
 </template>
 
 <script>
-/** ********* 用户管理部分模块 ***********/
+/** ********* 用户管理部分模块 ********* **/
 // 添加用户表单
 import AddForm from './user/AddUser'
 // 修改用户表单
 import EditForm from './user/EditUser'
 // 分配用户角色表单
 import AssignRoles from './user/AssignRoles'
-/** ************************************/
+/** ********************************** **/
 
-/** ********* 权限管理部分模块 ***********/
+/** ********* 权限管理部分模块 ********* **/
 import RoleTree from './power/RoleTree'
 import RoleAdd from './power/RoleAdd'
 import RoleEdit from './power/RoleEdit'
-/** ************************************/
+/** ********************************** **/
+
+/** ********* 商品管理部分模块 ********* **/
+import GoodsSortAdd from './goods/GoodsSortAdd'
+/** ********************************** **/
 
 import { mapState } from 'vuex'
 
@@ -103,7 +111,7 @@ export default {
     // ***********************************************************************************************************************************
     handleClose(val) {
       // console.log(this)
-      console.log(false)
+      console.log(this)
       this.componentLoding = false
       for (const key in this.$refs) {
         if (this.$refs[key]) {
@@ -140,6 +148,9 @@ export default {
           break
         case 'roleAdd':
           this.roleAdd()
+          break
+        case 'goodsSortAdd':
+          this.goodsSortAdd()
           break
         default:
           this.$message.error('暂无此方法!')
@@ -253,6 +264,9 @@ export default {
       }
       this.$message.success('角色添加成功!')
       this.handleClose('roleEdit')
+    },
+    goodsSortAdd() {
+      console.log(this)
     }
   },
   components: {
@@ -261,7 +275,8 @@ export default {
     'role-select': AssignRoles,
     'role-tree': RoleTree,
     'role-add': RoleAdd,
-    'role-edit': RoleEdit
+    'role-edit': RoleEdit,
+    'goods-sort-add': GoodsSortAdd
   }
 }
 </script>

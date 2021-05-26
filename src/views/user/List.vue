@@ -135,6 +135,7 @@ import DiaLogComponent from '../../components/Dialog'
 // 引入 vuex 中的数据
 import { mapState } from 'vuex'
 // import { mapState, mapMutations } from 'vuex'
+var jwt = require('jsonwebtoken')
 
 export default {
   data() {
@@ -211,9 +212,21 @@ export default {
       // 如果函数为 用户修改 操作
       if (userEdit) {
         // 获取 sessionStorage 中存储的 权力 名称
-        const powerArr = JSON.parse(window.sessionStorage.getItem('powername'))
+        // const powerArr = JSON.parse(window.sessionStorage.getItem('powername'))
+        // console.log(powerArr)
+        jwt.decode('token')
+        const tokenFlag = jwt.verify(
+          window.sessionStorage.getItem('token'),
+          'abc',
+          (err, decode) => {
+            if (err) return this.$message.error('token报错')
+            return decode
+            // console.log(decode)
+          }
+        )
+        console.log(tokenFlag)
         // 循环遍历获取的 权力 数组
-        const powerFlag = powerArr.some(item => {
+        const powerFlag = tokenFlag.powername.some(item => {
           return item === '用户修改'
         })
         // 判断该数组中是否含有 修改用户 的权力

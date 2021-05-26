@@ -118,6 +118,8 @@ export default {
       }
       window.sessionStorage.setItem('token', data.token)
       this.$store.commit('getUserInfo', data.userinfo)
+      console.log(data)
+      console.log(data.userinfo.powername)
       window.sessionStorage.setItem(
         'powername',
         JSON.stringify(data.userinfo.powername)

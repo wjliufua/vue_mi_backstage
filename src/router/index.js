@@ -64,6 +64,33 @@ const routes = [
               )
           }
         ]
+      },
+      {
+        path: '/goods',
+        name: 'GoodsIndex',
+        component: () =>
+          import(
+            /* webpackChunkName: "GoodsIndex" */ '../views/goods/Index.vue'
+          ),
+        redirect: '/list',
+        children: [
+          {
+            path: '/goods/list',
+            name: 'GoodsList',
+            component: () =>
+              import(
+                /* webpackChunkName: "GoodsList" */ '../views/goods/List.vue'
+              )
+          },
+          {
+            path: '/goods/sort',
+            name: 'GoodsSort',
+            component: () =>
+              import(
+                /* webpackChunkName: "GoodsSort" */ '../views/goods/Sort.vue'
+              )
+          }
+        ]
       }
     ]
   },
@@ -75,6 +102,15 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/About.vue')
+  },
+  {
+    path: '/test',
+    name: 'test',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "test" */ '../views/test.vue')
   }
 ]
 

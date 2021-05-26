@@ -23,11 +23,16 @@ export default new Vuex.Store({
     roleTreeData: [],
     positionId: '',
     roleTreePut: '',
+    // 商品分类数据
+    goodsSortList: [],
     // 控制 dialog 组件是否显示
     // dialogShow: false,
     AssginRoles: []
   },
   mutations: {
+    setGoodsSortList(state, goodsSortList) {
+      state.goodsSortList = goodsSortList
+    },
     getUserInfo(state, userinfo) {
       var key
       for (key in userinfo) {
