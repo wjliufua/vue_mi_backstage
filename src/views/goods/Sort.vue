@@ -136,6 +136,9 @@ export default {
     dialogClose(val) {
       console.log(val)
       this.dialogShow = false
+      if (typeof val === 'string') {
+        this.getGoodsSortList()
+      }
     }
   },
   components: {

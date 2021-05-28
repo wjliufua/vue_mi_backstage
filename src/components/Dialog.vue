@@ -265,8 +265,22 @@ export default {
       this.$message.success('角色添加成功!')
       this.handleClose('roleEdit')
     },
-    goodsSortAdd() {
-      console.log(this)
+    async goodsSortAdd() {
+      // console.log(this)
+      // const reqComponent = this.componentFor(this.$children, 1)
+      // const reqInfo = reqComponent.Form
+      const reqInfo = this.componentFor(this.$children, 1).Form
+      console.log(reqInfo)
+      if (reqInfo.name === '' || reqInfo.state === '') {
+        return this.$message.error('请输入完整的商品分类信息!')
+      }
+      const { data } = await this.$http.post('goods/sort', {
+        parame: reqInfo
+      })
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('添加商品分类失败!')
+      this.$message.success('添加商品分类成功!')
+      this.handleClose('addGoodsSort')
     }
   },
   components: {
