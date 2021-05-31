@@ -25,6 +25,13 @@ export default new Vuex.Store({
     roleTreePut: '',
     // 商品分类数据
     goodsSortList: [],
+    // 商品分类修改数据
+    goodsSortEditData: {
+      id: '',
+      goods_sort_name: '',
+      goods_sort_state: '',
+      goods_sort_level: ''
+    },
     // 控制 dialog 组件是否显示
     // dialogShow: false,
     AssginRoles: []
@@ -32,6 +39,15 @@ export default new Vuex.Store({
   mutations: {
     setGoodsSortList(state, goodsSortList) {
       state.goodsSortList = goodsSortList
+    },
+    setGoodsSortEdit(state, goodsSortEditData) {
+      state.goodsSortEditData.id = goodsSortEditData._id
+      state.goodsSortEditData.goods_sort_name =
+        goodsSortEditData.goods_sort_name
+      state.goodsSortEditData.goods_sort_state =
+        goodsSortEditData.goods_sort_state
+      state.goodsSortEditData.goods_sort_level =
+        goodsSortEditData.goods_sort_level
     },
     getUserInfo(state, userinfo) {
       var key

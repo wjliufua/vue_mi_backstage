@@ -41,6 +41,10 @@
     <goods-sort-add
       v-if="componentLoding && dialogContent === 'goodsSortAdd'"
     ></goods-sort-add>
+    <!-- 商品分类修改表单 -->
+    <goods-sort-edit
+      v-if="componentLoding && dialogContent === 'goodsSortEdit'"
+    ></goods-sort-edit>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -68,6 +72,7 @@ import RoleEdit from './power/RoleEdit'
 
 /** ********* 商品管理部分模块 ********* **/
 import GoodsSortAdd from './goods/GoodsSortAdd'
+import GoodsSortEdit from './goods/GoodsSortEdit'
 /** ********************************** **/
 
 import { mapState } from 'vuex'
@@ -100,7 +105,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userRoleId', 'positionId'])
+    ...mapState(['userRoleId', 'positionId', 'goodsSortEditData'])
   },
   methods: {
     childrenComponent() {
@@ -151,6 +156,9 @@ export default {
           break
         case 'goodsSortAdd':
           this.goodsSortAdd()
+          break
+        case 'goodsSortEdit':
+          this.goodsSortEdit()
           break
         default:
           this.$message.error('暂无此方法!')
@@ -281,6 +289,26 @@ export default {
       if (data.status !== 200) return this.$message.error('添加商品分类失败!')
       this.$message.success('添加商品分类成功!')
       this.handleClose('addGoodsSort')
+    },
+    async goodsSortEdit() {
+      // console.log(this)
+      // console.log(this.goodsSortEditData)
+      const reqInfo = this.componentFor(this.$children, 1).Form
+      console.log(reqInfo)
+      console.log(this.goodsSortEditData)
+      if (
+        reqInfo.name === this.goodsSortEditData.goods_sort_name &&
+        reqInfo.state === this.goodsSortEditData.goods_sort_state
+      ) {
+        return this.$message.error('请勿提交尚未修改的数据')
+      }
+      reqInfo.state = reqInfo.state === '启用' ? 0 : 1
+      // console.log(this)
+      // console.log(reqInfo)
+      const { data } = await this.$http.put('goods/sort', {
+        parame: reqInfo
+      })
+      console.log(data)
     }
   },
   components: {
@@ -290,7 +318,8 @@ export default {
     'role-tree': RoleTree,
     'role-add': RoleAdd,
     'role-edit': RoleEdit,
-    'goods-sort-add': GoodsSortAdd
+    'goods-sort-add': GoodsSortAdd,
+    'goods-sort-edit': GoodsSortEdit
   }
 }
 </script>

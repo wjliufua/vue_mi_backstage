@@ -51,8 +51,12 @@
             >三级</el-tag
           >
         </template>
-        <template slot="opt">
-          <el-button type="primary" icon="el-icon-edit" size="mini"
+        <template slot="opt" slot-scope="scope">
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
+            size="mini"
+            @click="handlGoodsSort('修改商品分类', 'goodsSortEdit', scope.row)"
             >修改</el-button
           >
           <el-button type="danger" icon="el-icon-delete" size="mini"
@@ -60,6 +64,17 @@
           >
         </template>
       </tree-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageState.pagenum"
+        :page-sizes="[5, 10, 15, 20]"
+        :page-size="pageState.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        style="margin-top: 30px;"
+      >
+      </el-pagination>
     </el-card>
     <!-- 使用 dialog 组件 -->
     <DiaLogComponent
@@ -105,8 +120,16 @@ export default {
         }
       ],
       dialogTitle: '',
+      dialogContent: '',
       dialogShow: false,
-      dialogContent: ''
+      total: 0,
+      // 页面状态
+      pageState: {
+        // 当前第几页
+        pageNum: 1,
+        // 当前一页显示多少条数据
+        pageSize: 5
+      }
     }
   },
   created() {
@@ -116,15 +139,22 @@ export default {
     // 解构获取 vuex state 中定义的数据
     // ...mapState(['GoodsSortList'])
     // ...mapState(['inputValue'])
-    ...mapMutations(['setGoodsSortList'])
+    ...mapMutations(['setGoodsSortList', 'setGoodsSortEdit'])
   },
   methods: {
     async getGoodsSortList() {
-      const data = await this.$http.get('goods/sort')
+      const { data } = await this.$http.get('goods/sort', {
+        params: this.pageState
+      })
       console.log(data)
-      const GoodsSortList = data.data.GoodsSortList
+      this.total = data.total
+      const GoodsSortList = data.GoodsSortList
       this.catelist = GoodsSortList
       this.$store.commit('setGoodsSortList', GoodsSortList)
+      if (data.status !== 200) {
+        return this.$message.error('商品分类信息获取失败!')
+      }
+      return this.$message.success('商品分类信息获取成功!')
     },
     showDialog(title, component) {
       console.log(this)
@@ -132,6 +162,19 @@ export default {
       this.dialogShow = true
       this.dialogTitle = title
       this.dialogContent = component
+    },
+    handlGoodsSort(dialogTitle, dialogContent, data) {
+      console.log(data)
+      this.$store.commit('setGoodsSortEdit', data)
+      this.showDialog(dialogTitle, dialogContent)
+    },
+    handleSizeChange(newSize) {
+      this.pageState.pageSize = newSize
+      this.getGoodsSortList()
+    },
+    handleCurrentChange(newPage) {
+      this.pageState.pageNum = newPage
+      this.getGoodsSortList()
     },
     dialogClose(val) {
       console.log(val)
@@ -144,6 +187,9 @@ export default {
   components: {
     // 挂载 dialog 组件
     DiaLogComponent
+  },
+  mounted() {
+    // this.getGoodsSortList()
   }
 }
 </script>
