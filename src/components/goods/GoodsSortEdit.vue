@@ -10,7 +10,11 @@
       <el-input v-model="Form.name"></el-input>
     </el-form-item>
     <el-form-item label="分类是否启用" prop="state">
-      <el-select v-model="Form.state" placeholder="请选择该分类是否启用">
+      <el-select
+        v-model="Form.state"
+        placeholder="请选择该分类是否启用"
+        @change="handleSelectData"
+      >
         <el-option label="启用" value="0"></el-option>
         <el-option label="禁用" value="1"></el-option>
       </el-select>
@@ -20,7 +24,7 @@
 
 <script>
 // 引入 vuex 中的数据
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
   data() {
@@ -50,9 +54,9 @@ export default {
   },
   computed: {
     // 解构获取 vuex state 中定义的数据
-    ...mapState(['goodsSortEditData'])
+    ...mapState(['goodsSortEditData']),
     // ...mapState(['inputValue'])
-    // ...mapMutations(['goodsSortList'])
+    ...mapMutations(['goodsSortList'])
   },
   methods: {
     FormDataSet() {
@@ -61,6 +65,12 @@ export default {
       this.Form.level = this.goodsSortEditData.goods_sort_level
       this.Form.state =
         this.goodsSortEditData.goods_sort_state === 0 ? '启用' : '禁用'
+    },
+    handleSelectData(val) {
+      console.log(val)
+      this.Form.state = val
+      console.log(this.Form.state)
+    //   this.$store.commit('abc', this.Form)
     }
   }
 }

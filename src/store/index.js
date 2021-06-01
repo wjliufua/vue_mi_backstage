@@ -49,6 +49,10 @@ export default new Vuex.Store({
       state.goodsSortEditData.goods_sort_level =
         goodsSortEditData.goods_sort_level
     },
+    abc(state, goodsSortEditData) {
+      state.goodsSortEditData.goods_sort_state =
+        goodsSortEditData.state
+    },
     getUserInfo(state, userinfo) {
       var key
       for (key in userinfo) {

@@ -291,7 +291,7 @@ export default {
       this.handleClose('addGoodsSort')
     },
     async goodsSortEdit() {
-      // console.log(this)
+      console.log(this)
       // console.log(this.goodsSortEditData)
       const reqInfo = this.componentFor(this.$children, 1).Form
       console.log(reqInfo)
@@ -302,13 +302,17 @@ export default {
       ) {
         return this.$message.error('请勿提交尚未修改的数据')
       }
+      // console.log(reqInfo.state)
       reqInfo.state = reqInfo.state === '启用' ? 0 : 1
+      reqInfo.state = reqInfo.state === '0' ? 0 : 1
+      // console.log(reqInfo.state)
       // console.log(this)
       // console.log(reqInfo)
-      const { data } = await this.$http.put('goods/sort', {
-        parame: reqInfo
-      })
-      console.log(data)
+      // const { data } = await this.$http.put('goods/sort', {
+      //   parame: reqInfo
+      // })
+      // console.log(data)
+      // this.handleClose('goodsSortEdit')
     }
   },
   components: {
