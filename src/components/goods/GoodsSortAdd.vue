@@ -10,9 +10,9 @@
       <el-input v-model="Form.name"></el-input>
     </el-form-item>
     <el-form-item label="分类是否启用" prop="state">
-      <el-select v-model="Form.state" placeholder="请选择该分类是否启用">
-        <el-option label="启用" value="0"></el-option>
-        <el-option label="禁用" value="1"></el-option>
+      <el-select v-model="Form.state" placeholder="该分类是否启用该分类">
+        <el-option label="启用" value="启用"></el-option>
+        <el-option label="禁用" value="禁用"></el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="父级分类">
@@ -56,7 +56,11 @@ export default {
           { required: true, message: '请输入商品分类名称', trigger: 'blur' }
         ],
         state: [
-          { required: true, message: '请选择商品分类是否启用', trigger: 'change' }
+          {
+            required: true,
+            message: '请选择商品分类是否启用',
+            trigger: 'change'
+          }
         ]
       },
       value: [],

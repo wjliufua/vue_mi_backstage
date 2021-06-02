@@ -15,8 +15,8 @@
         placeholder="请选择该分类是否启用"
         @change="handleSelectData"
       >
-        <el-option label="启用" value="0"></el-option>
-        <el-option label="禁用" value="1"></el-option>
+        <el-option label="启用" value="启用"></el-option>
+        <el-option label="禁用" value="禁用"></el-option>
       </el-select>
     </el-form-item>
   </el-form>
@@ -63,14 +63,18 @@ export default {
       this.Form.id = this.goodsSortEditData.id
       this.Form.name = this.goodsSortEditData.goods_sort_name
       this.Form.level = this.goodsSortEditData.goods_sort_level
-      this.Form.state =
-        this.goodsSortEditData.goods_sort_state === 0 ? '启用' : '禁用'
+      //   this.Form.state =
+      //     this.goodsSortEditData.goods_sort_state === 0 ? '启用' : '禁用'
+      this.Form.state = this.goodsSortEditData.goods_sort_state
+      //   console.log(this.Form.state)
     },
     handleSelectData(val) {
-      console.log(val)
+      //   console.log(val)
       this.Form.state = val
-      console.log(this.Form.state)
-    //   this.$store.commit('abc', this.Form)
+      //   console.log(this.Form.state)
+      this.$emit('handleGoodsSortEditData', val)
+      //   console.log(this)
+      //   this.$store.commit('abc', this.Form)
     }
   }
 }

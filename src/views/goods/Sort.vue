@@ -28,7 +28,7 @@
         <!-- 是否启用模板 -->
         <template slot="isOk" slot-scope="scope">
           <i
-            v-if="scope.row.goods_sort_state === 0"
+            v-if="scope.row.goods_sort_state === '启用'"
             class="el-icon-success"
             style="color: lightgreen;"
           ></i>

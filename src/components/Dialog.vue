@@ -43,6 +43,7 @@
     ></goods-sort-add>
     <!-- 商品分类修改表单 -->
     <goods-sort-edit
+      @handleGoodsSortEditData="setGoodsSortEditData($event)"
       v-if="componentLoding && dialogContent === 'goodsSortEdit'"
     ></goods-sort-edit>
     <span slot="footer" class="dialog-footer">
@@ -101,7 +102,9 @@ export default {
   },
   data() {
     return {
-      componentLoding: true
+      componentLoding: true,
+      goodsSortReqInfo: {},
+      goodsSortEditState: 0
     }
   },
   computed: {
@@ -290,29 +293,38 @@ export default {
       this.$message.success('添加商品分类成功!')
       this.handleClose('addGoodsSort')
     },
+    setGoodsSortEditData(goodsSortEditState) {
+      // console.log(goodsSortEditState)
+      // this.goodsSortReqInfo = this.componentFor(this.$children, 1).Form
+      // this.goodsSortReqInfo.state = goodsSortEditState
+      this.goodsSortEditState = goodsSortEditState
+    },
     async goodsSortEdit() {
       console.log(this)
       // console.log(this.goodsSortEditData)
       const reqInfo = this.componentFor(this.$children, 1).Form
       console.log(reqInfo)
       console.log(this.goodsSortEditData)
+      reqInfo.state = this.goodsSortEditState
       if (
         reqInfo.name === this.goodsSortEditData.goods_sort_name &&
         reqInfo.state === this.goodsSortEditData.goods_sort_state
       ) {
+        console.log(this)
         return this.$message.error('请勿提交尚未修改的数据')
       }
       // console.log(reqInfo.state)
-      reqInfo.state = reqInfo.state === '启用' ? 0 : 1
-      reqInfo.state = reqInfo.state === '0' ? 0 : 1
-      // console.log(reqInfo.state)
+      // reqInfo.state = reqInfo.state === '0' ? 0 : 1
+      // reqInfo.state =
+      //   reqInfo.state === '启用' ? 0 : 1
+      // console.log(goodsSortReqInfo.state)
       // console.log(this)
       // console.log(reqInfo)
-      // const { data } = await this.$http.put('goods/sort', {
-      //   parame: reqInfo
-      // })
-      // console.log(data)
-      // this.handleClose('goodsSortEdit')
+      const { data } = await this.$http.put('goods/sort', {
+        parame: reqInfo
+      })
+      console.log(data)
+      this.handleClose('goodsSortEdit')
     }
   },
   components: {
