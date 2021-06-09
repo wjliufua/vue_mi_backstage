@@ -22,7 +22,7 @@
         ></el-cascader>
       </div>
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="动态参数" name="first">
+        <el-tab-pane label="动态参数" name="parameter">
           <el-button type="primary" size="mini">添加参数</el-button>
           <el-table :data="dynamicParameterData" border style="width: 100%">
             <el-table-column type="expand">
@@ -59,12 +59,18 @@
             <el-table-column label="参数名称" prop="params_name">
             </el-table-column>
             <el-table-column label="操作">
-              <template>
+              <template slot-scope="scope">
                 <el-button
                   type="primary"
                   icon="el-icon-edit"
                   size="mini"
-                  @click="showDialog('修改动态参数名称', 'editParams')"
+                  @click="
+                    showDialog('修改动态参数名称', 'goodsParamsEdit', {
+                      name: scope.row.params_name,
+                      id: scope.row._id,
+                      edit: 'params'
+                    })
+                  "
                   >编辑</el-button
                 >
                 <el-button type="danger" icon="el-icon-delete" size="mini"
@@ -74,14 +80,14 @@
             </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="静态属性" name="second">
+        <el-tab-pane label="静态属性" name="attribute">
           <el-button type="primary" size="mini">添加属性</el-button>
           <el-table :data="staticPropertiesData" border style="width: 100%">
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag
                   :key="tag"
-                  v-for="tag in scope.row.attribute_tag"
+                  v-for="tag in scope.row"
                   closable
                   :disable-transitions="false"
                   @close="handleClose(tag)"
@@ -111,12 +117,18 @@
             <el-table-column label="属性名称" prop="attribute_name">
             </el-table-column>
             <el-table-column label="操作">
-              <template>
+              <template slot-scope="scope">
                 <el-button
                   type="primary"
                   icon="el-icon-edit"
                   size="mini"
-                  @click="showDialog('修改静态属性名称', 'editParams')"
+                  @click="
+                    showDialog('修改静态属性名称', 'goodsParamsEdit', {
+                      name: scope.row.attribute_name,
+                      id: scope.row._id,
+                      edit: 'attribute'
+                    })
+                  "
                   >编辑</el-button
                 >
                 <el-button type="danger" icon="el-icon-delete" size="mini"
@@ -138,6 +150,8 @@
 </template>
 
 <script>
+// 引入 vuex 中的数据
+import { mapMutations } from 'vuex'
 // 引入封装的 dialog 组件
 import DiaLogComponent from '../../components/Dialog'
 
@@ -148,7 +162,7 @@ export default {
       value: [],
       options: [],
       // tabs 标签
-      activeName: 'second',
+      activeName: 'parameter',
       // table 表格
       dynamicParameterData: [],
       staticPropertiesData: [],
@@ -165,6 +179,10 @@ export default {
   created() {
     this.getGoodsTag()
   },
+  computed: {
+    // ...mapState(['goodsParamsEditData']),
+    ...mapMutations(['setGoodsSortEditData'])
+  },
   methods: {
     async getGoodsTag() {
       const { data } = await this.$http.get('goods/sort')
@@ -180,8 +198,13 @@ export default {
       // console.log(goodsSortList)
       this.options = goodsSortList
     },
-    showDialog(title, component) {
+    showDialog(title, component, data) {
       console.log(this)
+      if (data) {
+        console.log(data)
+        this.$store.commit('setGoodsSortEditData', data)
+      }
+      this.$children[this.$children.length - 1].childrenComponent()
       this.dialogShow = true
       this.dialogTitle = title
       this.dialogContent = component

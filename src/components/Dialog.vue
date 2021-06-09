@@ -12,6 +12,7 @@
     :visible.sync="dialogShow"
     :before-close="handleClose"
   >
+    <!-- {{ componentLoding }} -->
     <!-- 添加用户表单 -->
     <add-form
       ref="addForm"
@@ -46,6 +47,10 @@
       @handleGoodsSortEditData="setGoodsSortEditData($event)"
       v-if="componentLoding && dialogContent === 'goodsSortEdit'"
     ></goods-sort-edit>
+    <!-- 商品参数修改表单 -->
+    <goods-params-edit
+      v-if="componentLoding && dialogContent === 'goodsParamsEdit'"
+    ></goods-params-edit>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -74,6 +79,7 @@ import RoleEdit from './power/RoleEdit'
 /** ********* 商品管理部分模块 ********* **/
 import GoodsSortAdd from './goods/GoodsSortAdd'
 import GoodsSortEdit from './goods/GoodsSortEdit'
+import ParamsEdit from './goods/ParamsEdit'
 /** ********************************** **/
 
 import { mapState } from 'vuex'
@@ -120,6 +126,7 @@ export default {
     handleClose(val) {
       // console.log(this)
       console.log(this)
+      console.log('dialog组件关闭')
       this.componentLoding = false
       for (const key in this.$refs) {
         if (this.$refs[key]) {
@@ -162,6 +169,9 @@ export default {
           break
         case 'goodsSortEdit':
           this.goodsSortEdit()
+          break
+        case 'goodsParamsEdit':
+          this.goodsParamsEdit()
           break
         default:
           this.$message.error('暂无此方法!')
@@ -325,6 +335,10 @@ export default {
       })
       console.log(data)
       this.handleClose('goodsSortEdit')
+    },
+    goodsParamsEdit() {
+      const reqInfo = this.componentFor(this.$children, 1).Form
+      console.log(reqInfo)
     }
   },
   components: {
@@ -335,7 +349,8 @@ export default {
     'role-add': RoleAdd,
     'role-edit': RoleEdit,
     'goods-sort-add': GoodsSortAdd,
-    'goods-sort-edit': GoodsSortEdit
+    'goods-sort-edit': GoodsSortEdit,
+    'goods-params-edit': ParamsEdit
   }
 }
 </script>
