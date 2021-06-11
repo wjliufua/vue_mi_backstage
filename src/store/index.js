@@ -35,7 +35,8 @@ export default new Vuex.Store({
     // 商品参数修改数据
     goodsParamsEditData: {
       name: '',
-      id: ''
+      id: '',
+      edit: ''
     },
     // 控制 dialog 组件是否显示
     // dialogShow: false,
@@ -50,6 +51,7 @@ export default new Vuex.Store({
       console.log(data)
       state.goodsParamsEditData.name = data.name
       state.goodsParamsEditData.id = data.id
+      state.goodsParamsEditData.edit = data.edit
     },
     setGoodsSortEdit(state, goodsSortEditData) {
       state.goodsSortEditData.id = goodsSortEditData._id

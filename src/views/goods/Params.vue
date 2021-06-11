@@ -68,7 +68,7 @@
                     showDialog('修改动态参数名称', 'goodsParamsEdit', {
                       name: scope.row.params_name,
                       id: scope.row._id,
-                      edit: 'params'
+                      edit: 'dynamic_parameter'
                     })
                   "
                   >编辑</el-button
@@ -126,7 +126,7 @@
                     showDialog('修改静态属性名称', 'goodsParamsEdit', {
                       name: scope.row.attribute_name,
                       id: scope.row._id,
-                      edit: 'attribute'
+                      edit: 'static_properties'
                     })
                   "
                   >编辑</el-button
@@ -213,7 +213,11 @@ export default {
       console.log(val)
       this.dialogShow = false
       if (typeof val === 'string') {
-        this.getGoodsSortList()
+        // this.getGoodsSortList()
+        this.getSortParamsAttribute(
+          this.value[this.value.length - 1],
+          this.value[this.value.length - 2]
+        )
       }
     },
     forGoodsSort(goodsChildrenList) {
@@ -234,6 +238,7 @@ export default {
       })
       return handlGoodsChildrenList
     },
+    // 获取商品参数
     async getSortParamsAttribute(id, pid) {
       const { data } = await this.$http.get(`goods/tag/${id}`, {
         params: { pid: pid }

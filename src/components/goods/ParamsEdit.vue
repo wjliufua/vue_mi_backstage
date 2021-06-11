@@ -31,6 +31,7 @@ export default {
       console.log(this.goodsParamsEditData)
       this.Form.name = this.goodsParamsEditData.name
       this.Form.id = this.goodsParamsEditData.id
+      this.Form.edit = this.goodsParamsEditData.edit
     }
   }
 }

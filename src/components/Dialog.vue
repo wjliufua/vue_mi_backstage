@@ -336,9 +336,17 @@ export default {
       console.log(data)
       this.handleClose('goodsSortEdit')
     },
-    goodsParamsEdit() {
+    async goodsParamsEdit() {
       const reqInfo = this.componentFor(this.$children, 1).Form
       console.log(reqInfo)
+      const { data } = await this.$http.put(`goods/tag/${reqInfo.id}`, {
+        name: reqInfo.name,
+        edit: reqInfo.edit
+      })
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('修改商品参数失败!')
+      this.$message.success('修改商品参数成功!')
+      this.handleClose('goodsParamsEdit')
     }
   },
   components: {
