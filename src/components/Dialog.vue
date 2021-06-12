@@ -51,6 +51,10 @@
     <goods-params-edit
       v-if="componentLoding && dialogContent === 'goodsParamsEdit'"
     ></goods-params-edit>
+    <!-- 商品参数添加表单 -->
+    <goods-params-add
+      v-if="componentLoding && dialogContent === 'goodsParamsAdd'"
+    ></goods-params-add>
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取 消</el-button>
       <el-button type="primary" @click="handleDetermine(dialogContent)"
@@ -80,6 +84,7 @@ import RoleEdit from './power/RoleEdit'
 import GoodsSortAdd from './goods/GoodsSortAdd'
 import GoodsSortEdit from './goods/GoodsSortEdit'
 import ParamsEdit from './goods/ParamsEdit'
+import ParamsAdd from './goods/ParamsAdd'
 /** ********************************** **/
 
 import { mapState } from 'vuex'
@@ -114,7 +119,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userRoleId', 'positionId', 'goodsSortEditData'])
+    ...mapState([
+      'userRoleId',
+      'positionId',
+      'goodsSortEditData',
+      'goodsParamsAddData'
+    ])
   },
   methods: {
     childrenComponent() {
@@ -172,6 +182,9 @@ export default {
           break
         case 'goodsParamsEdit':
           this.goodsParamsEdit()
+          break
+        case 'goodsParamsAdd':
+          this.goodsParamsAdd()
           break
         default:
           this.$message.error('暂无此方法!')
@@ -347,6 +360,22 @@ export default {
       if (data.status !== 200) return this.$message.error('修改商品参数失败!')
       this.$message.success('修改商品参数成功!')
       this.handleClose('goodsParamsEdit')
+    },
+    async goodsParamsAdd() {
+      const reqInfo = this.componentFor(this.$children, 1).Form
+      console.log(reqInfo)
+      console.log(this.goodsParamsAddData)
+      const { data } = await this.$http.post(
+        `goods/label/${this.goodsParamsAddData.id}`,
+        {
+          name: reqInfo.name,
+          add: this.goodsParamsAddData.add
+        }
+      )
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('添加商品参数失败!')
+      this.$message.success('添加商品参数成功!')
+      this.handleClose('goodsParamsAdd')
     }
   },
   components: {
@@ -358,7 +387,8 @@ export default {
     'role-edit': RoleEdit,
     'goods-sort-add': GoodsSortAdd,
     'goods-sort-edit': GoodsSortEdit,
-    'goods-params-edit': ParamsEdit
+    'goods-params-edit': ParamsEdit,
+    'goods-params-add': ParamsAdd
   }
 }
 </script>

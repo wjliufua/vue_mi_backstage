@@ -38,6 +38,11 @@ export default new Vuex.Store({
       id: '',
       edit: ''
     },
+    // 商品参数添加数据
+    goodsParamsAddData: {
+      add: '',
+      id: ''
+    },
     // 控制 dialog 组件是否显示
     // dialogShow: false,
     AssginRoles: []
@@ -46,7 +51,11 @@ export default new Vuex.Store({
     setGoodsSortList(state, goodsSortList) {
       state.goodsSortList = goodsSortList
     },
-    setGoodsSortEditData(state, data) {
+    setGoodsParamsAddData(state, data) {
+      state.goodsParamsAddData.id = data.id
+      state.goodsParamsAddData.add = data.add
+    },
+    setGoodsParamsEditData(state, data) {
       // console.log('store')
       console.log(data)
       state.goodsParamsEditData.name = data.name

@@ -23,7 +23,16 @@
       </div>
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="动态参数" name="parameter">
-          <el-button type="primary" size="mini">添加参数</el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            @click="
+              showDialog('修改动态参数名称', 'goodsParamsAdd', {
+                add: 'dynamic_parameter'
+              })
+            "
+            >添加参数</el-button
+          >
           <el-table :data="dynamicParameterData" border style="width: 100%">
             <el-table-column type="expand">
               <template slot-scope="scope">
@@ -38,19 +47,20 @@
                 </el-tag>
                 <el-input
                   class="input-new-tag"
-                  v-if="inputVisible"
-                  v-model="inputValue"
-                  ref="saveTagInput"
+                  v-if="paramsTagInputVisible"
+                  v-model="paramsTagInputValue"
+                  ref="saveParamsTagInput"
                   size="small"
-                  @keyup.enter.native="handleInputConfirm"
-                  @blur="handleInputConfirm"
+                  @keyup.enter.native="
+                    paramsTagInput('dynamic_parameter', scope.row._id)
+                  "
                 >
                 </el-input>
                 <el-button
                   v-else
                   class="button-new-tag"
                   size="small"
-                  @click="showInput"
+                  @click="showParamsTagInput"
                   >+ 添加新参数标签</el-button
                 >
               </template>
@@ -81,7 +91,16 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="attribute">
-          <el-button type="primary" size="mini">添加属性</el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            @click="
+              showDialog('修改动态参数名称', 'goodsParamsAdd', {
+                add: 'static_properties'
+              })
+            "
+            >添加属性</el-button
+          >
           <el-table :data="staticPropertiesData" border style="width: 100%">
             <el-table-column type="expand">
               <template slot-scope="scope">
@@ -101,7 +120,6 @@
                   ref="saveTagInput"
                   size="small"
                   @keyup.enter.native="handleInputConfirm"
-                  @blur="handleInputConfirm"
                 >
                 </el-input>
                 <el-button
@@ -167,9 +185,13 @@ export default {
       dynamicParameterData: [],
       staticPropertiesData: [],
       // tag 标签
-      dynamicTags: ['标签一', '标签二', '标签三'],
+      // dynamicTags: ['标签一', '标签二', '标签三'],
       inputVisible: false,
       inputValue: '',
+      // paramsTag 标签
+      // dynamicTags: ['标签一', '标签二', '标签三'],
+      paramsTagInputVisible: false,
+      paramsTagInputValue: '',
       // dialog 标签
       dialogTitle: '',
       dialogContent: '',
@@ -200,9 +222,15 @@ export default {
     },
     showDialog(title, component, data) {
       console.log(this)
-      if (data) {
+      if (data.edit) {
         console.log(data)
-        this.$store.commit('setGoodsSortEditData', data)
+        this.$store.commit('setGoodsParamsEditData', data)
+      }
+      if (data.add) {
+        this.$store.commit('setGoodsParamsAddData', {
+          add: data.add,
+          id: this.value[this.value.length - 1]
+        })
       }
       this.$children[this.$children.length - 1].childrenComponent()
       this.dialogShow = true
@@ -268,16 +296,46 @@ export default {
     },
     // tag 标签
     handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      console.log('tag')
+      console.log(tag)
+      // this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
     },
+    // tag 标签
     showInput() {
       this.inputVisible = true
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus()
       })
     },
+    // tag 标签
+    async paramsTagInput(tagCategory, id) {
+      // console.log(1)
+      // console.log(this.paramsTagInputValue)
+      console.log(id)
+      const { data } = await this.$http.post(`goods/tag/${id}`, {
+        tagName: this.paramsTagInputValue,
+        addTag: tagCategory
+      })
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('添加商品参数失败!')
+      this.$message.success('添加商品参数成功!')
+      this.getSortParamsAttribute(
+        this.value[this.value.length - 1],
+        this.value[this.value.length - 2]
+      )
+      this.paramsTagInputVisible = false
+      this.paramsTagInputValue = ''
+    },
+    showParamsTagInput() {
+      this.paramsTagInputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveParamsTagInput.$refs.input.focus()
+      })
+    },
+    // tag 标签
     handleInputConfirm() {
-      console.log(123)
+      // console.log(123)
+      console.log(this.inputValue)
       //   let inputValue = this.inputValue
       //   if (inputValue) {
       //     this.dynamicTags.push(inputValue)
