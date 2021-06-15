@@ -26,6 +26,7 @@
           <el-button
             type="primary"
             size="mini"
+            :disabled="isButton"
             @click="
               showDialog('修改动态参数名称', 'goodsParamsAdd', {
                 add: 'dynamic_parameter'
@@ -94,6 +95,7 @@
           <el-button
             type="primary"
             size="mini"
+            :disabled="isButton"
             @click="
               showDialog('修改动态参数名称', 'goodsParamsAdd', {
                 add: 'static_properties'
@@ -181,6 +183,8 @@ export default {
       options: [],
       // tabs 标签
       activeName: 'parameter',
+      // 添加属性及参数按钮
+      isButton: true,
       // table 表格
       dynamicParameterData: [],
       staticPropertiesData: [],
@@ -285,6 +289,7 @@ export default {
     // cascader 级联选择器
     handleCascaderChange(value) {
       console.log(value)
+      this.isButton = false
       this.getSortParamsAttribute(
         value[value.length - 1],
         value[value.length - 2]
