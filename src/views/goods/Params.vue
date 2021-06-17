@@ -108,7 +108,7 @@
               <template slot-scope="scope">
                 <el-tag
                   :key="tag"
-                  v-for="tag in scope.row"
+                  v-for="tag in scope.row.attribute_tag"
                   closable
                   :disable-transitions="false"
                   @close="handleClose(tag)"
@@ -277,14 +277,24 @@ export default {
       })
       console.log(data.GoodsDetailsTag)
       const { GoodsDetailsTag } = data
+      this.staticPropertiesData =
+        GoodsDetailsTag[GoodsDetailsTag.length - 1].static_properties.map(
+          item => {
+            return {
+              attribute_name: item.attribute_name,
+              attribute_tag: item.attribute_tag.split(','),
+              _id: item._id
+            }
+          }
+        ) || []
       // const dynamicParameter =
       //   data.GoodsDetailsTag[GoodsDetailsTag.length - 1].dynamic_parameter || []
       // const staticProperties =
       //   data.GoodsDetailsTag[GoodsDetailsTag.length - 1].static_properties || []
       this.dynamicParameterData =
         GoodsDetailsTag[GoodsDetailsTag.length - 1].dynamic_parameter || []
-      this.staticPropertiesData =
-        GoodsDetailsTag[GoodsDetailsTag.length - 1].static_properties || []
+      // this.staticPropertiesData =
+      //   GoodsDetailsTag[GoodsDetailsTag.length - 1].static_properties || []
     },
     // cascader 级联选择器
     handleCascaderChange(value) {

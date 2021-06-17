@@ -55,20 +55,58 @@
           label="商品参数"
           name="second"
           :disabled="this.value.length === 0 ? true : false"
-          >商品参数</el-tab-pane
         >
+          <el-form-item
+            :label="item.params_name"
+            v-for="(item, index) in paramsTag"
+            :key="index"
+          >
+            <el-checkbox-group v-model="item.params_tag">
+              <el-checkbox
+                :label="cb"
+                v-for="(cb, i) in item.params_tag"
+                :key="i"
+                border
+              ></el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-tab-pane>
         <el-tab-pane
           label="商品属性"
           name="third"
           :disabled="this.value.length === 0 ? true : false"
-          >商品属性</el-tab-pane
         >
+          <el-alert
+            title="属性有多个请使用英文的逗号隔开,否则会出现错误"
+            type="warning"
+            show-icon
+          >
+          </el-alert>
+          <el-form-item
+            :label="item.attribute_name"
+            v-for="(item, index) in attributeTag"
+            :key="index"
+          >
+            <el-input v-model="item.attribute_tag"></el-input>
+          </el-form-item>
+        </el-tab-pane>
         <el-tab-pane
           label="商品图片"
           name="fourth"
           :disabled="this.value.length === 0 ? true : false"
-          >商品图片</el-tab-pane
         >
+          <el-upload
+            class="upload-demo"
+            :action="uploadURL"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :file-list="fileList"
+            :headers="headerObj"
+            list-type="picture"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-tab-pane>
         <el-tab-pane
           label="商品内容"
           name="fifth"
@@ -104,7 +142,15 @@ export default {
         number: [{ required: true, message: '请输入商品数量', trigger: 'blur' }]
       },
       value: [],
-      options: []
+      options: [],
+      paramsTag: [],
+      attributeTag: [],
+      fileList: [],
+      // 上传图片的URL地址
+      uploadURL: 'http://127.0.0.1:7000/api/private/v1/goods/goodsImg',
+      headerObj: {
+        Authorization: window.sessionStorage.getItem('token')
+      }
     }
   },
   created() {
@@ -124,6 +170,21 @@ export default {
       })
       // console.log(goodsSortList)
       this.options = goodsSortList
+    },
+    async getSortParamsAttribute(id, pid) {
+      const { data } = await this.$http.get(`goods/tag/${id}`, {
+        params: { pid: pid }
+      })
+      console.log(data.GoodsDetailsTag)
+      const { GoodsDetailsTag } = data
+      this.paramsTag = GoodsDetailsTag[0].dynamic_parameter
+      this.attributeTag = GoodsDetailsTag[0].static_properties
+      console.log(this.paramsTag)
+      console.log(this.attributeTag)
+      // this.dynamicParameterData =
+      //   GoodsDetailsTag[GoodsDetailsTag.length - 1].dynamic_parameter || []
+      // this.staticPropertiesData =
+      //   GoodsDetailsTag[GoodsDetailsTag.length - 1].static_properties || []
     },
     forGoodsSort(goodsChildrenList) {
       const handlGoodsChildrenList = goodsChildrenList.map(m => {
@@ -154,6 +215,17 @@ export default {
     },
     handleChange(value) {
       console.log(value)
+      this.getSortParamsAttribute(
+        value[value.length - 1],
+        value[value.length - 2]
+      )
+    },
+    // 图片上传
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    handlePreview(file) {
+      console.log(file)
     }
   }
 }
@@ -167,5 +239,8 @@ export default {
   width: 1000px;
   margin: 30px 0;
   margin-left: 50px;
+}
+.el-checkbox {
+  margin-right: 0px;
 }
 </style>
