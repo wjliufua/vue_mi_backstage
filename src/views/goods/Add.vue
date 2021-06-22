@@ -17,6 +17,7 @@
         <el-step title="商品内容"></el-step>
         <el-step title="完成"></el-step>
       </el-steps>
+      <!-- form 表单 -->
       <el-form
         :model="Form"
         :rules="rules"
@@ -31,6 +32,7 @@
           v-model="activeName"
           @tab-click="handleClick"
         >
+          <!-- 选项卡 基本信息切换项 -->
           <el-tab-pane label="基本信息" name="first">
             <el-form-item label="商品名称" prop="name">
               <el-input v-model="Form.name"></el-input>
@@ -44,7 +46,7 @@
             <el-form-item label="商品数量" prop="number">
               <el-input v-model="Form.number"></el-input>
             </el-form-item>
-            <el-form-item label="商品数量">
+            <el-form-item label="商品分类">
               <el-cascader
                 v-model="value"
                 :options="options"
@@ -52,6 +54,7 @@
               ></el-cascader>
             </el-form-item>
           </el-tab-pane>
+          <!-- 选项卡 基本参数切换项 -->
           <el-tab-pane
             label="商品参数"
             name="second"
@@ -72,6 +75,7 @@
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
+          <!-- 选项卡 基本属性切换项 -->
           <el-tab-pane
             label="商品属性"
             name="third"
@@ -91,6 +95,7 @@
               <el-input v-model="item.attribute_tag"></el-input>
             </el-form-item>
           </el-tab-pane>
+          <!-- 选项卡 基本图片切换项 -->
           <el-tab-pane
             label="商品图片"
             name="fourth"
@@ -101,6 +106,7 @@
               :action="uploadURL"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
+              :on-success="imgeUploadSuccess"
               :file-list="fileList"
               :headers="headerObj"
               name="uploads"
@@ -109,6 +115,7 @@
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
+          <!-- 选项卡 商品内容切换项 -->
           <el-tab-pane
             label="商品内容"
             name="fifth"
@@ -130,6 +137,7 @@
         </el-tabs>
       </el-form>
     </el-card>
+    <!-- 点击查看大图 -->
     <el-dialog title="查看图片" :visible.sync="viewPicture">
       <img width="100%" :src="viewPictureUrl" alt="" />
     </el-dialog>
@@ -137,26 +145,32 @@
 </template>
 
 <script>
+/* ******* 引入vue-quill-editor组件 ******* */
 import { quillEditor } from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+/* ******* *********************** ******* */
 
 export default {
   data() {
     return {
+      // 步骤条默认进度(0开始)
       active: 0,
+      // tab 选项卡默认选择项
       activeName: 'first',
+      // form 表单默认数据
       Form: {
         name: '',
         price: 0,
         weight: 0,
         number: 0
       },
+      // form 表单验证规则
       rules: {
         name: [
           { required: true, message: '请输入商品名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ],
         price: [{ required: true, message: '请输入商品价格', trigger: 'blur' }],
         weight: [
@@ -164,21 +178,32 @@ export default {
         ],
         number: [{ required: true, message: '请输入商品数量', trigger: 'blur' }]
       },
+      // 存储级联选择器选中的 数据
       value: [],
+      // 级联选择器数据
       options: [],
+      // 参数 tag 标签数组
       paramsTag: [],
+      // 属性 tag 标签数组
       attributeTag: [],
+      // 图片上传 存储数组
       fileList: [],
       // 上传图片的URL地址
       uploadURL: 'http://127.0.0.1:7000/api/private/v1/goods/goodsImg',
+      // 上传图片的请求头设置
       headerObj: {
         Authorization: window.sessionStorage.getItem('token')
       },
+      // 控制查看图片的 dialog 组件是否显示
       viewPicture: false,
+      // 查看图片的 url 地址
       viewPictureUrl: '',
-      // 富文本编辑器
+      // 上传的全部图片的 url 地址
+      goodsPictureUrl: [],
+      // vue-quill-editor 富文本编辑器编辑内容
       content: '<p>1</p>',
       // str: '',
+      // vue-quill-editor 富文本编辑器的工具栏配置
       editorOption: {
         placeholder: '请在这里输入',
         modules: {
@@ -211,6 +236,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * 获取级联选择器数据
+     */
     async getGoodsTag() {
       const { data } = await this.$http.get('goods/sort')
       console.log(data)
@@ -225,6 +253,11 @@ export default {
       // console.log(goodsSortList)
       this.options = goodsSortList
     },
+    /**
+     * 获取商品标签
+     * @param {String} id - 级联选择器获取的 三级 商品分类 id
+     * @param {String} pid - 级联选择器获取的 二级 商品分类 id
+     */
     async getSortParamsAttribute(id, pid) {
       const { data } = await this.$http.get(`goods/tag/${id}`, {
         params: { pid: pid }
@@ -284,6 +317,21 @@ export default {
       this.viewPicture = true
       this.viewPictureUrl = file.url
     },
+    imgeUploadSuccess(response, file, fileList) {
+      // console.log(response)
+      // console.log(file)
+      // console.log(fileList)
+      // this.viewPictureUrl = file.url
+      // console.log(fileList)
+      // const imgeSplit = fileList[0].split(':')
+      // const imgeUrl = imgeSplit[imgeSplit.length - 1]
+      this.goodsPictureUrl = fileList.map(m => {
+        const imgeSplit = m.url.split('blob:')
+        const imgeUrl = imgeSplit[imgeSplit.length - 1]
+        return imgeUrl
+      })
+      // console.log(this.goodsPictureUrl)
+    },
     // 富文本编辑器
     onEditorReady(editor) {
       // 准备编辑器
@@ -307,8 +355,37 @@ export default {
     //   str = str.replace(/&gt;/g, '>')
     //   return str
     // },
-    addGoods() {
-      console.log('添加商品')
+    async addGoods() {
+      // console.log('添加商品')
+      // console.log(this.paramsTag)
+      // console.log(this.attributeTag)
+      // console.log(this.Form)
+      // console.log(this.content)
+      // console.log(this.goodsPictureUrl)
+      const paramsTags = this.paramsTag.map(m => {
+        return m.params_tag.map(x => {
+          return x
+        })
+      })
+      const attributeTags = this.attributeTag.map(m => {
+        return m.attribute_tag
+      })
+      // console.log(paramsTags)
+      // console.log(attributeTags)
+      const { data } = await this.$http.post('/goods', {
+        goodsName: this.Form.name,
+        goodsWeight: this.Form.weight,
+        goodsNumber: this.Form.number,
+        goodsPrice: this.Form.price,
+        goodsParams: paramsTags.join().split(','),
+        goodsAttribute: attributeTags,
+        goodsDetails: this.content,
+        revealImageInitialPath: this.goodsPictureUrl
+      })
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('添加商品失败!')
+      this.$message.success('添加商品成功!')
+      this.$router.push('/goods/list')
     }
   },
   components: {

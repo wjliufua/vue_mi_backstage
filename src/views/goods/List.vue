@@ -23,7 +23,6 @@
       <el-table :data="goodsListData" border stripe style="width: 100%">
         <el-table-column
           type="index"
-          label="索引"
           width="50px"
           align="center"
         ></el-table-column>
@@ -43,7 +42,7 @@
         >
         </el-table-column>
         <el-table-column
-          prop="goodsNum"
+          prop="goodsNumber"
           label="商品数量(个)"
           width="140"
           align="center"
@@ -74,7 +73,7 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage4"
+        :current-page="pageState.pagenum"
         :page-sizes="[5, 10, 15, 20]"
         :page-size="5"
         layout="total, sizes, prev, pager, next, jumper"
@@ -89,53 +88,39 @@
 export default {
   data() {
     return {
-      goodsListData: [
-        {
-          goodsName: 'baiabibfoidabfdsbfkjdbfkjdbfjdsk',
-          goodsPrice: 12,
-          goodsNum: 23,
-          goodsWeight: '23',
-          goodsCreateDate: '2021-5-21 14:31'
-        },
-        {
-          goodsName: '15615159195159',
-          goodsPrice: 12,
-          goodsNum: 23,
-          goodsWeight: '23',
-          goodsCreateDate: '2021-5-21 14:31'
-        },
-        {
-          goodsName: '15615159195159',
-          goodsPrice: 12,
-          goodsNum: 23,
-          goodsWeight: '23',
-          goodsCreateDate: '2021-5-21 14:31'
-        },
-        {
-          goodsName: '15615159195159',
-          goodsPrice: 12,
-          goodsNum: 23,
-          goodsWeight: '23',
-          goodsCreateDate: '2021-5-21 14:31'
-        },
-        {
-          goodsName: '15615159195159',
-          goodsPrice: 12,
-          goodsNum: 23,
-          goodsWeight: '23',
-          goodsCreateDate: '2021-5-21 14:31'
-        }
-      ],
+      goodsListData: [],
       input3: '',
-      currentPage4: ''
+      // 用户数据总条数
+      total: 0,
+      // 页面状态
+      pageState: {
+        // 当前第几页
+        pageNum: 1,
+        // 当前一页显示多少条数据
+        pageSize: 5
+      }
     }
   },
+  created() {
+    this.getGoodsList()
+  },
   methods: {
-    handleSizeChange() {
-      console.log(132)
+    async getGoodsList() {
+      const { data } = await this.$http.get('goods', {
+        parmas: {}
+      })
+      console.log(data)
+      if (data.status !== 200) return this.$message.error('获取商品列表失败!')
+      this.$message.success('获取商品列表成功!')
+      this.goodsListData = data.goodsList
     },
-    handleCurrentChange() {
-      console.log(46)
+    handleSizeChange(newSize) {
+      this.pageState.pageSize = newSize
+      this.getUserList()
+    },
+    handleCurrentChange(newPage) {
+      this.pageState.pageNum = newPage
+      this.getUserList()
     },
     goGoodsAddpage() {
       this.$router.push('/goods/add')
