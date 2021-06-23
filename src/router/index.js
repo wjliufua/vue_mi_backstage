@@ -66,6 +66,34 @@ const routes = [
         ]
       },
       {
+        path: '/page',
+        name: 'PageIndex',
+        component: () =>
+          import(/* webpackChunkName: "PageIndex" */ '../views/page/Index.vue'),
+        redirect: '/pc',
+        children: [
+          {
+            path: '/page/pc',
+            name: 'pagePCIndex',
+            component: () =>
+              import(
+                /* webpackChunkName: "pagePCIndex" */ '../views/page/pc/Index.vue'
+              ),
+            redirect: '/home',
+            children: [
+              {
+                path: '/page/pc/home',
+                name: 'PCHomePage',
+                component: () =>
+                  import(
+                    /* webpackChunkName: "PCHomePage" */ '../views/page/pc/Home.vue'
+                  )
+              }
+            ]
+          }
+        ]
+      },
+      {
         path: '/goods',
         name: 'GoodsIndex',
         component: () =>

@@ -10,9 +10,17 @@ import './assets/common.css'
 // 引入公共样式
 import './assets/font.css'
 
+// css全局样式
+import './assets/css/common.css'
+import './assets/css/font.css'
+
 import TreeTable from 'vue-table-with-tree-grid'
 
 import axios from 'axios'
+
+import VueAwesomeSwiper from 'vue-awesome-swiper'
+import 'swiper/dist/css/swiper.css'
+Vue.use(VueAwesomeSwiper /* { default global options } */)
 
 axios.defaults.baseURL = 'http://127.0.0.1:7000/api/private/v1/'
 // axios.defaults.headers.token = window.sessionStorage.getItem('token')

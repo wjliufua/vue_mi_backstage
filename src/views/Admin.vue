@@ -39,10 +39,19 @@
                   <i class="el-icon-document"></i>
                   <span slot="title">{{ secondly.name }}</span>
                 </template>
-                <template v-for="(again, i3) in secondly.children">
+                <template v-for="(third, i3) in secondly.children">
+                  <el-submenu
+                    :index="third.path"
+                    :key="i3"
+                    v-if="third.children && third.children.length > 0"
+                  ></el-submenu>
                   <!-- 单级菜单 三级菜单 -->
-                  <el-menu-item :index="again.path" :key="i3">
-                    {{ again.name }}
+                  <!-- <el-menu-item :index="third.path" :key="i3">
+                    {{ third.name }}
+                  </el-menu-item> -->
+                  <el-menu-item :key="i3" :index="third.path" v-else>
+                    <i class="el-icon-menu"></i>
+                    <span slot="title">{{ third.name }}</span>
                   </el-menu-item>
                 </template>
               </el-submenu>
@@ -121,6 +130,7 @@ export default {
           const sideItem = {
             name: m.name,
             path: m.route,
+            level: m.level,
             children: []
           }
           sideList.push(sideItem)
@@ -128,20 +138,40 @@ export default {
           mIndex++
         }
       })
+      // console.log(sideList)
       this.menulist = sideList
       if (data.status !== 200) return this.$message.error(data.message)
-      if (data.status === 200) return this.$message.success(data.message)
+      return this.$message.success(data.message)
     },
     handleSide(menus, sideList, route, mIndex) {
+      // console.log(menus)
+      // console.log(sideList)
+      // console.log(route)
+      // console.log(mIndex)
       menus.map(m => {
         if (m.proute === route) {
           const childrenItem = {
             name: m.name,
             path: m.route,
+            level: m.level,
             children: []
           }
-          sideList[mIndex].children.push(childrenItem)
-          this.handleSide(menus, childrenItem, m.route)
+          if (m.level === 2) {
+            sideList[mIndex].children.push(childrenItem)
+            this.handleSide(
+              menus,
+              childrenItem,
+              m.route,
+              sideList[mIndex].children.length - 1
+            )
+          }
+          if (m.level === 3) {
+            // console.log(3)
+            // sideList[mIndex].children.push(childrenItem)
+            sideList.children.push(childrenItem)
+            this.handleSide(menus, childrenItem, m.route)
+          }
+          // this.handleSide(menus, childrenItem, m.route, xindex)
         }
       })
     },

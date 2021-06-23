@@ -1,0 +1,63 @@
+html,
+body,
+ul,
+li,
+div,
+p {
+  padding: 0;
+  margin: 0;
+}
+html {
+  overflow-y: scroll;
+}
+:root {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+:root body {
+  position: absolute;
+}
+body {
+  width: 100vw;
+  overflow: hidden;
+}
+a {
+  text-decoration: none;
+}
+li {
+  list-style: none;
+}
+.el_show {
+  display: block;
+}
+.all_goods {
+  color: #fff;
+}
+.mouse_default {
+  cursor: default;
+}
+html {
+  overflow: hidden;
+  font-family: sans-serif;
+}
+html body {
+  font: 14px/1.5 Helvetica Neue, Helvetica, Arial, Microsoft Yahei, Hiragino Sans GB, Heiti SC, WenQuanYi Micro Hei, sans-serif;
+  color: #333;
+  background-color: #fff;
+  min-width: 1226px;
+}
+html body [class*=iconfont] {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-stroke-width: 0.2px;
+}
+html body [type="submit"] {
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+html body .container {
+  width: 1226px;
+  margin: 0 auto;
+}
