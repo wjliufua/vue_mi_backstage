@@ -471,7 +471,7 @@
           </a>
         </div>
 
-        <!-- 商品展示橱窗 -->
+        <!-- 手机商品展示橱窗 -->
         <div class="shopwindow">
           <div class="box-hd">
             <h2 class="title">手机</h2>
@@ -618,6 +618,13 @@
                 </ul>
               </div>
             </div>
+          </div>
+          <div
+            class="editSwiperData"
+            v-if="isBackstage"
+            @click="openDrawer('编辑首页轮播图', 'editPcHomeBanner')"
+          >
+            <p>编辑手机展示橱窗内容<i class="iconfont icon-bianji"></i></p>
           </div>
         </div>
 
@@ -878,13 +885,17 @@
       :direction="direction"
       :before-close="handleClose"
     >
-      <el-form ref="Form" :model="Form" label-width="80px">
+      <el-form ref="Form" :model="Form" label-width="120px">
         <div v-for="(item, index) in swiperImages" :key="index">
           <el-image style="width: 100%;" :src="item.url"> </el-image>
           <el-form-item :label="item.label">
             <el-input v-model="Form[item.bannerAddress]"></el-input>
           </el-form-item>
         </div>
+        <el-row class="drawerButton">
+          <el-button @click="handleClose()">取消</el-button>
+          <el-button type="primary" @click="editPageData()">提交</el-button>
+        </el-row>
         <!-- <el-form-item label="轮播图1">
           <el-input v-model="Form.bannerOne"></el-input>
         </el-form-item>
@@ -898,10 +909,6 @@
           <el-input v-model="Form.bannerFour"></el-input>
         </el-form-item> -->
       </el-form>
-      <el-row class="drawerButton">
-        <el-button @click="handleClose()">取消</el-button>
-        <el-button type="primary" @click="editPageData()">提交</el-button>
-      </el-row>
     </el-drawer>
   </div>
 </template>
@@ -923,41 +930,36 @@ export default {
       drawer: false,
       direction: 'rtl',
       // 表单
-      Form: {
-        bannerOne: '',
-        bannerTow: '',
-        bannerThree: '',
-        bannerFour: ''
-      },
+      Form: {},
       // 前台
       swiperImages: [
         {
           url:
             'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/5084e471aa2554867cd1c9bf333a83e4.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          desc: '红米K40 游戏增强版',
+          //   desc: '红米K40 游戏增强版',
           bannerAddress: 'bannerOne',
-          label: '轮播图1'
+          label: '轮播图1地址链接'
         },
         {
           url:
             'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/a5ebb3ecd10ba5b5f1fa25125d034492.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          desc: '红米电视MAX 86寸',
+          //   desc: '红米电视MAX 86寸',
           bannerAddress: 'bannerTow',
-          label: '轮播图2'
+          label: '轮播图2地址链接'
         },
         {
           url:
             'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/175b22f0032803f8bdbd94590c8c6629.jpeg?thumb=1&w=1226&h=460&f=webp&q=90',
-          desc: '小米笔记本Pro 15',
+          //   desc: '小米笔记本Pro 15',
           bannerAddress: 'bannerThree',
-          label: '轮播图3'
+          label: '轮播图3地址链接'
         },
         {
           url:
             'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/96b2b6279cbfca1c1d78f463ccf40fcf.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          desc: '米家智能驱蚊器2',
+          //   desc: '米家智能驱蚊器2',
           bannerAddress: 'bannerFour',
-          label: '轮播图4'
+          label: '轮播图4地址链接'
         }
       ],
       flashSaleDate: new Date(),
@@ -1027,13 +1029,25 @@ export default {
       }, 1000)
     },
     openDrawer() {
+      this.swiperImages.map(item => {
+        this.Form[item.bannerAddress] = item.url
+      })
       this.drawer = true
     },
     handleClose(done) {
       this.drawer = false
     },
-    editPageData() {
+
+    /** ************************************************
+     * @description 修改页面数据
+     ************************************************ */
+    async editPageData() {
       console.log('修改页面数据')
+      console.log(this.Form)
+      const { data } = await this.$http.put('PcPage/HomeBanner', {
+        params: this.Form
+      })
+      console.log(data)
     }
     /**
      * @description 接收调用此页面的 父组件 传递过来的数据
@@ -1099,29 +1113,33 @@ ul::after {
   display: table;
 }
 
-.el-drawer__open .el-drawer.rtl{
-   overflow: scroll;
+/deep/.el-drawer__body {
+  overflow: scroll;
 }
-
-// .el-drawer {
-//   .rtl {
-//     overflow: scroll;
-//   }
-// }
 
 .el-form {
   padding: 0 20px;
 }
 
 .drawerButton {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  //   position: absolute;
+  //   right: 20px;
+  //   bottom: 20px;
+}
+
+.shopwindow:hover & > .editSwiperData {
+  height: 100%;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .editSwiperData {
   display: flex;
   position: absolute;
+  top: 0;
   z-index: 99999;
   width: 100%;
   height: 0%;
@@ -1605,6 +1623,7 @@ ul::after {
       overflow: hidden;
     }
     .shopwindow {
+      position: relative;
       .box-hd {
         position: relative;
         height: 58px;

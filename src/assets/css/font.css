@@ -1,9 +1,8 @@
 @font-face {
-  font-family: "iconfont";
-  /* Project id 2453751 */
-  src: url('//at.alicdn.com/t/font_2453751_geqwmm6yg6.woff2?t=1620876453121') format('woff2'),
-    url('//at.alicdn.com/t/font_2453751_geqwmm6yg6.woff?t=1620876453121') format('woff'),
-    url('//at.alicdn.com/t/font_2453751_geqwmm6yg6.ttf?t=1620876453121') format('truetype');
+  font-family: "iconfont"; /* Project id 2453751 */
+  src: url('//at.alicdn.com/t/font_2453751_wp4ajiayt5b.woff2?t=1624416512889') format('woff2'),
+       url('//at.alicdn.com/t/font_2453751_wp4ajiayt5b.woff?t=1624416512889') format('woff'),
+       url('//at.alicdn.com/t/font_2453751_wp4ajiayt5b.ttf?t=1624416512889') format('truetype');
 }
 
 .iconfont {
@@ -12,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bianji:before {
+  content: "\e894";
 }
 
 .icon-cart:before {
