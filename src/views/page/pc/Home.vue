@@ -40,6 +40,7 @@
         <swiper
           :options="bannerHomeSwiper"
           ref="mySwiper"
+          v-if="isHandleSwiper"
           class="bannerHomeSwiper"
         >
           <div
@@ -622,7 +623,7 @@
           <div
             class="editSwiperData"
             v-if="isBackstage"
-            @click="openDrawer('编辑首页轮播图', 'editPcHomeBanner')"
+            @click="openDrawer('编辑手机展示橱窗', 'editPcHomePhoneShow')"
           >
             <p>编辑手机展示橱窗内容<i class="iconfont icon-bianji"></i></p>
           </div>
@@ -880,35 +881,45 @@
     <Footer></Footer>
     <ToolBar></ToolBar>
     <el-drawer
-      title="我是标题"
+      :title="drawerTitle"
       :visible.sync="drawer"
       :direction="direction"
       :before-close="handleClose"
     >
-      <el-form ref="Form" :model="Form" label-width="120px">
-        <div v-for="(item, index) in swiperImages" :key="index">
-          <el-image style="width: 100%;" :src="item.url"> </el-image>
-          <el-form-item :label="item.label">
-            <el-input v-model="Form[item.bannerAddress]"></el-input>
-          </el-form-item>
-        </div>
-        <el-row class="drawerButton">
-          <el-button @click="handleClose()">取消</el-button>
-          <el-button type="primary" @click="editPageData()">提交</el-button>
-        </el-row>
-        <!-- <el-form-item label="轮播图1">
-          <el-input v-model="Form.bannerOne"></el-input>
-        </el-form-item>
-        <el-form-item label="轮播图2">
-          <el-input v-model="Form.bannerTow"></el-input>
-        </el-form-item>
-        <el-form-item label="轮播图3">
-          <el-input v-model="Form.bannerThree"></el-input>
-        </el-form-item>
-        <el-form-item label="轮播图4">
-          <el-input v-model="Form.bannerFour"></el-input>
-        </el-form-item> -->
-      </el-form>
+      <template v-if="editComponent === 'editPcHomeBanner'">
+        <el-form ref="Form" :model="Form" label-width="120px">
+          <div v-for="(item, index) in swiperImages" :key="index">
+            <el-image style="width: 100%;" :src="item.url"> </el-image>
+            <el-form-item :label="item.label">
+              <el-input v-model="Form[item.bannerAddress]"></el-input>
+            </el-form-item>
+          </div>
+          <el-row class="drawerButton">
+            <el-button @click="handleClose()">取消</el-button>
+            <el-button type="primary" @click="editPageData()">提交</el-button>
+          </el-row>
+        </el-form>
+      </template>
+      <template v-if="editComponent === 'editPcHomePhoneShow'">
+        <el-card>
+          <el-table :data="tableData" border stripe style="width: 100%;">
+            <el-table-column prop="date" label="展示图片" width="180">
+              <template>
+                <el-image
+                  style="width: 100%;"
+                  :src="url"
+                >
+                </el-image>
+              </template>
+            </el-table-column>
+            <el-table-column prop="url" label="图片地址">
+              <template>
+                <el-input v-model="input" placeholder="请输入内容"></el-input>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </template>
     </el-drawer>
   </div>
 </template>
@@ -928,40 +939,69 @@ export default {
       isBackstage: true,
       // 抽屉
       drawer: false,
+      drawerTitle: '',
+      editComponent: '',
       direction: 'rtl',
+      url:
+        '//cdn.cnbj1.fds.api.mi-img.com/mi-mall/c583f2edc613f1be20fa415910b13ce3.jpg?thumb=1&w=234&h=614&f=webp&q=90',
       // 表单
       Form: {},
-      // 前台
-      swiperImages: [
+      // 表格
+      tableData: [
         {
-          url:
-            'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/5084e471aa2554867cd1c9bf333a83e4.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          //   desc: '红米K40 游戏增强版',
-          bannerAddress: 'bannerOne',
-          label: '轮播图1地址链接'
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
         },
         {
-          url:
-            'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/a5ebb3ecd10ba5b5f1fa25125d034492.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          //   desc: '红米电视MAX 86寸',
-          bannerAddress: 'bannerTow',
-          label: '轮播图2地址链接'
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1517 弄'
         },
         {
-          url:
-            'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/175b22f0032803f8bdbd94590c8c6629.jpeg?thumb=1&w=1226&h=460&f=webp&q=90',
-          //   desc: '小米笔记本Pro 15',
-          bannerAddress: 'bannerThree',
-          label: '轮播图3地址链接'
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
         },
         {
-          url:
-            'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/96b2b6279cbfca1c1d78f463ccf40fcf.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
-          //   desc: '米家智能驱蚊器2',
-          bannerAddress: 'bannerFour',
-          label: '轮播图4地址链接'
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1516 弄'
         }
       ],
+      input: '',
+      // 前台
+      swiperImages: [
+        // {
+        //   url:
+        //     'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/5084e471aa2554867cd1c9bf333a83e4.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
+        //   //   desc: '红米K40 游戏增强版',
+        //   bannerAddress: 'bannerOne',
+        //   label: '轮播图1地址链接'
+        // },
+        // {
+        //   url:
+        //     'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/a5ebb3ecd10ba5b5f1fa25125d034492.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
+        //   //   desc: '红米电视MAX 86寸',
+        //   bannerAddress: 'bannerTow',
+        //   label: '轮播图2地址链接'
+        // },
+        // {
+        //   url:
+        //     'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/175b22f0032803f8bdbd94590c8c6629.jpeg?thumb=1&w=1226&h=460&f=webp&q=90',
+        //   //   desc: '小米笔记本Pro 15',
+        //   bannerAddress: 'bannerThree',
+        //   label: '轮播图3地址链接'
+        // },
+        // {
+        //   url:
+        //     'https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/96b2b6279cbfca1c1d78f463ccf40fcf.jpg?thumb=1&w=1226&h=460&f=webp&q=90',
+        //   //   desc: '米家智能驱蚊器2',
+        //   bannerAddress: 'bannerFour',
+        //   label: '轮播图4地址链接'
+        // }
+      ],
+      isHandleSwiper: false,
       flashSaleDate: new Date(),
       flashSaleHou: 0,
       flashSaleMin: 0,
@@ -1000,7 +1040,26 @@ export default {
       }
     }
   },
+  created() {
+    this.getPcHomeBanner()
+  },
   methods: {
+    async getPcHomeBanner() {
+      const { data } = await this.$http.get('PcPage/HomeBanner')
+      console.log(data)
+      if (data.status !== 200) {
+        return this.$message.error('获取前台首页轮播图图片地址失败!')
+      }
+      this.$message.success('获取前台首页轮播图图片地址成功!')
+      //   this.swiperImages = [
+      //     data.homeBannerList[0],
+      //     ...data.homeBannerList,
+      //     data.homeBannerList[data.homeBannerList.length - 1]
+      //   ]
+      console.log(this)
+      this.swiperImages = data.homeBannerList
+      this.isHandleSwiper = true
+    },
     flashSaleSwiperStyle() {
       this.$refs.flashSaleSwiper.$children.forEach(item => {
         item.$el.style.marginRight = '14px'
@@ -1028,11 +1087,33 @@ export default {
         }
       }, 1000)
     },
-    openDrawer() {
+    /**
+     * @desc 打开抽屉
+     * @param { String } drawerTitle - 抽屉标题
+     * @param { String } editComponent - 需要调用的组件
+     */
+    openDrawer(drawerTitle, editComponent) {
+      this.drawerTitle = drawerTitle
+      this.editComponent = editComponent
+      switch (editComponent) {
+        case 'editPcHomeBanner':
+          this.hannerSwiper()
+          break
+        case 'editPcHomePhoneShow':
+          this.phone()
+          break
+        default:
+          this.$message.error('没有此选项!')
+      }
+      this.drawer = true
+    },
+    hannerSwiper() {
       this.swiperImages.map(item => {
         this.Form[item.bannerAddress] = item.url
       })
-      this.drawer = true
+    },
+    phone() {
+      console.log('手机')
     },
     handleClose(done) {
       this.drawer = false
@@ -1048,6 +1129,13 @@ export default {
         params: this.Form
       })
       console.log(data)
+      if (data.status !== 200) {
+        return this.$message.error('修改前台首页轮播图图片地址失败!')
+      }
+      this.$message.success('修改前台首页轮播图图片地址成功!')
+      this.getPcHomeBanner()
+      this.drawer = false
+      this.isHandleSwiper = false
     }
     /**
      * @description 接收调用此页面的 父组件 传递过来的数据
@@ -1081,7 +1169,6 @@ export default {
     swiper,
     swiperSlide
   },
-  created() {},
 
   /* ******************** vue 监听 ******************** */
   watch: {
@@ -1134,6 +1221,12 @@ ul::after {
   height: 100%;
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.swiper-slide {
+  img {
+    width: 100%;
+  }
 }
 
 .editSwiperData {
